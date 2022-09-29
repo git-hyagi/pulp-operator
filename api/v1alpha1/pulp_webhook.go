@@ -73,17 +73,43 @@ func (r *Pulp) ValidateUpdate(old runtime.Object) error {
 	}
 
 	// non-nil values (once defined, these fields should not be deleted but can be modified)
-	// we allow to use another SC or PVC or update credentials to access the Object Storage
-	// but we should not allow to delete the field (which would deploy emptyDir) once it was defined
-	nonNilFields := []string{"FileStorageClass", "ObjectStorageAzureSecret", "ObjectStorageS3Secret", "PVC"}
+	nonNilFields := []string{
+		// we allow to use another SC or PVC or update credentials to access the Object Storage
+		// but we should not allow to delete the field (which would deploy emptyDir) once it was defined
+		"FileStorageClass", "ObjectStorageAzureSecret", "ObjectStorageS3Secret", "PVC",
+
+		// updating the following fields are allowed but we should deny the deletion of the field itself
+		"DBFieldsEncryptionSecret", "SigningSecret", "SigningScriptsConfigmap",
+		"ContainerTokenSecret", "ContainerAuthPublicKey", "ContainerAuthPrivateKey",
+		"IngressType", "Image", "AdminPasswordSecret", "SSOSecret",
+	}
 	for _, field := range nonNilFields {
 		newField := reflect.ValueOf(r.Spec).FieldByName(field)
 		oldField := reflect.ValueOf(oldPulp.Spec).FieldByName(field)
 		if len(oldField.Interface().(string)) > 0 && len(newField.Interface().(string)) == 0 {
 			pulplog.Info("Error trying to remove field!", "field", field)
-			return fmt.Errorf("%s should not be removed because doing so would lose all cluster data", field)
+
+			switch field {
+			case "IngressType", "Image", "AdminPasswordSecret", "SSOSecret":
+				return fmt.Errorf("%s should not be removed, update the field content if needed", field)
+
+			default:
+				return fmt.Errorf("%s should not be removed because doing so would lose all cluster data", field)
+			}
+
 		}
 	}
+
+	// it is hard to predict the impact on modifying each field of settings.py
+	// if users try to delete pulp_settings field we'll just rollback (deny) the modification
+	// for now, I belive that this validation is not needed because trying to delete the field
+	// gives the following error:
+	// * spec.pulp_settings: Invalid value: "null": spec.pulp_settings in body must be of type object: "null"
+	// which I think that is handled by +kubebuilder:pruning:PreserveUnknownFields marker, but I'm not sure
+	/* if len(oldPulp.Spec.PulpSettings.Raw) > 0 && len(r.Spec.PulpSettings.Raw) == 0 {
+		pulplog.Info("Error trying to remove pulp_settings field!")
+		return fmt.Errorf("pulp_settings should not be removed, update the field content if needed")
+	} */
 
 	// check database field removal
 	// if the old CR wasn't empty and we are trying to delete its content
@@ -91,6 +117,14 @@ func (r *Pulp) ValidateUpdate(old runtime.Object) error {
 	if !reflect.DeepEqual(oldPulp.Spec.Database, Database{}) && reflect.DeepEqual(r.Spec.Database, Database{}) {
 		pulplog.Info("Error trying to remove database field!")
 		return fmt.Errorf("unable to remove database field... this field should not be deleted")
+	}
+
+	// check ImageVersion field removal.
+	// when ImageVersion field is removed it will receive the default "stable". We need to
+	// check if the ImageWebVersion is also set as "stable" to avoid error
+	if r.Spec.ImageVersion != r.Spec.ImageWebVersion {
+		pulplog.Info("Error trying to update image_version field! ImageVersion and ImageWebVersion should be equal.")
+		return fmt.Errorf("unable to remove image_version field... image_version and image_web_version should be equal")
 	}
 
 	return nil
