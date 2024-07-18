@@ -1,0 +1,691 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  creationTimestamp: null
+  name: pulpresources.repo-manager.pulpproject.org
+spec:
+  group: repo-manager.pulpproject.org
+  names:
+    kind: PulpResource
+    listKind: PulpResourceList
+    plural: pulpresources
+    singular: pulpresource
+  scope: Namespaced
+  versions:
+  - name: v1beta2
+    schema:
+      openAPIV3Schema:
+        description: PulpResource is the Schema for the pulpresource API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: PulpResourceSpec defines the desired state of PulpResource
+            properties:
+              client_config:
+                type: string
+              container:
+                properties:
+                  distribution:
+                    properties:
+                      base_path:
+                        type: string
+                      content-guard:
+                        type: string
+                      name:
+                        type: string
+                      private:
+                        type: boolean
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      repository:
+                        type: string
+                      version:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: string
+                      download_concurrency:
+                        type: integer
+                      exclude_tags:
+                        items:
+                          type: string
+                        type: array
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      include_tags:
+                        items:
+                          type: string
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sigstore:
+                        type: string
+                      sock_connect_timeout:
+                        type: string
+                      sock_read_timeout:
+                        type: string
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      upstream_name:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  repository:
+                    properties:
+                      description:
+                        type: string
+                      name:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      remote:
+                        type: string
+                      retain-repo-versions:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  sync:
+                    type: boolean
+                type: object
+              file:
+                properties:
+                  distribution:
+                    properties:
+                      base_path:
+                        type: string
+                      content-guard:
+                        type: string
+                      name:
+                        type: string
+                      publication:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      repository:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: string
+                      download_concurrency:
+                        type: integer
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sock_connect_timeout:
+                        type: string
+                      sock_read_timeout:
+                        type: string
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  repository:
+                    properties:
+                      autopublish:
+                        type: boolean
+                      description:
+                        type: string
+                      manifest:
+                        type: string
+                      name:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      remote:
+                        type: string
+                      retain-repo-versions:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  sync:
+                    type: boolean
+                type: object
+              rpm:
+                properties:
+                  distribution:
+                    properties:
+                      base_path:
+                        type: string
+                      content-guard:
+                        type: string
+                      generate-repo-config:
+                        type: boolean
+                      name:
+                        type: string
+                      publication:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      repository:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: string
+                      download_concurrency:
+                        type: integer
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sles_auth_token:
+                        type: string
+                      sock_connect_timeout:
+                        type: string
+                      sock_read_timeout:
+                        type: string
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  repository:
+                    properties:
+                      autopublish:
+                        type: boolean
+                      checksum-type:
+                        type: string
+                      description:
+                        type: string
+                      manifest:
+                        type: string
+                      metadata-signing-service:
+                        type: string
+                      name:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      remote:
+                        type: string
+                      repo-config:
+                        type: string
+                      retain-package-vesions:
+                        type: integer
+                      retain-repo-versions:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  sync:
+                    type: boolean
+                type: object
+            type: object
+          status:
+            description: PulpResourceStatus defines the observed state of PulpResource
+            properties:
+              container:
+                properties:
+                  distribution:
+                    properties:
+                      base_path:
+                        type: string
+                      content-guard:
+                        type: string
+                      name:
+                        type: string
+                      private:
+                        type: boolean
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      repository:
+                        type: string
+                      version:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: string
+                      download_concurrency:
+                        type: integer
+                      exclude_tags:
+                        items:
+                          type: string
+                        type: array
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      include_tags:
+                        items:
+                          type: string
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sigstore:
+                        type: string
+                      sock_connect_timeout:
+                        type: string
+                      sock_read_timeout:
+                        type: string
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      upstream_name:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  repository:
+                    properties:
+                      description:
+                        type: string
+                      name:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      remote:
+                        type: string
+                      retain-repo-versions:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  sync:
+                    type: boolean
+                type: object
+              file:
+                properties:
+                  distribution:
+                    properties:
+                      base_path:
+                        type: string
+                      content-guard:
+                        type: string
+                      name:
+                        type: string
+                      publication:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      repository:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: string
+                      download_concurrency:
+                        type: integer
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sock_connect_timeout:
+                        type: string
+                      sock_read_timeout:
+                        type: string
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  repository:
+                    properties:
+                      autopublish:
+                        type: boolean
+                      description:
+                        type: string
+                      manifest:
+                        type: string
+                      name:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      remote:
+                        type: string
+                      retain-repo-versions:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  sync:
+                    type: boolean
+                type: object
+              rpm:
+                properties:
+                  distribution:
+                    properties:
+                      base_path:
+                        type: string
+                      content-guard:
+                        type: string
+                      generate-repo-config:
+                        type: boolean
+                      name:
+                        type: string
+                      publication:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      repository:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: string
+                      download_concurrency:
+                        type: integer
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sles_auth_token:
+                        type: string
+                      sock_connect_timeout:
+                        type: string
+                      sock_read_timeout:
+                        type: string
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  repository:
+                    properties:
+                      autopublish:
+                        type: boolean
+                      checksum-type:
+                        type: string
+                      description:
+                        type: string
+                      manifest:
+                        type: string
+                      metadata-signing-service:
+                        type: string
+                      name:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      remote:
+                        type: string
+                      repo-config:
+                        type: string
+                      retain-package-vesions:
+                        type: integer
+                      retain-repo-versions:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  sync:
+                    type: boolean
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

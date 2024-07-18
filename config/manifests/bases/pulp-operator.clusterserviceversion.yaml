@@ -242,6 +242,11 @@ spec:
         displayName: Deployment Name
         path: deploymentName
       version: v1beta2
+    - description: PulpResource is the Schema for the pulpresource API
+      displayName: Pulp Resource
+      kind: PulpResource
+      name: pulpresources.repo-manager.pulpproject.org
+      version: v1beta2
     - description: PulpRestore is the Schema for the pulprestores API
       displayName: Pulp Restore
       kind: PulpRestore

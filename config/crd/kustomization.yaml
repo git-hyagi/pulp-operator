@@ -5,6 +5,7 @@ resources:
 - bases/repo-manager.pulpproject.org_pulps.yaml
 - bases/repo-manager.pulpproject.org_pulpbackups.yaml
 - bases/repo-manager.pulpproject.org_pulprestores.yaml
+- bases/repo-manager.pulpproject.org_pulpresources.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

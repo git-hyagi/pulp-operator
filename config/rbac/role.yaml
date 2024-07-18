@@ -150,6 +150,32 @@ rules:
 - apiGroups:
   - repo-manager.pulpproject.org
   resources:
+  - pulpresources
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - repo-manager.pulpproject.org
+  resources:
+  - pulpresources/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - repo-manager.pulpproject.org
+  resources:
+  - pulpresources/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - repo-manager.pulpproject.org
+  resources:
   - pulprestores
   verbs:
   - create

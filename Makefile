@@ -116,6 +116,7 @@ manifests: tidy controller-gen crd-to-markdown ## Generate WebhookConfiguration,
 	$(CRD_MARKDOWN) -f apis/repo-manager.$(CR_DOMAIN)/v1beta2/pulp_types.go -n $(CR_KIND) > controllers/repo_manager/README.md
 	$(CRD_MARKDOWN) -f apis/repo-manager.$(CR_DOMAIN)/v1beta2/pulp_backup_types.go -n $(CR_KIND)Backup > controllers/backup/README.md
 	$(CRD_MARKDOWN) -f apis/repo-manager.$(CR_DOMAIN)/v1beta2/pulp_restore_types.go -n $(CR_KIND)Restore > controllers/restore/README.md
+	$(CRD_MARKDOWN) -f apis/repo-manager.$(CR_DOMAIN)/v1beta2/pulp_resource_types.go -n $(CR_KIND)Resource > controllers/pulp_resources/README.md
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
@@ -177,11 +178,13 @@ rename: ## Replace Custom Resource name
 	find config/samples/*.yaml -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
 	sed -i "s/Pulp/${CR_KIND}/g" PROJECT
 	sed -i "s/pulpproject.org/${CR_DOMAIN}/g" PROJECT main.go
+	sed -i "s/RepoManagerPulpResourceReconciler/RepoManager${CR_KIND}ResourceReconciler/g" main.go
 	find apis/repo-manager.pulpproject.org/*/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
 	find bundle/manifests/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
 	find config/*/* -exec sed -i "s/pulps/${CR_PLURAL}/g" {} \;
 	find config/*/* -exec sed -i "s/pulprestores/${LOWER_CR_KIND}restores/g" {} \;
 	find config/*/* -exec sed -i "s/pulpbackups/${LOWER_CR_KIND}backups/g" {} \;
+	find config/*/* -exec sed -i "s/pulpresources/${LOWER_CR_KIND}resources/g" {} \;
 	sed -i "s/pulp/${LOWER_CR_KIND}/g" config/default/kustomization.yaml
 	find config/*/* -exec sed -i "s/3b5210cd.pulpproject.org/3b5210cd.${CR_DOMAIN}/g" {} \;
 	find config/*/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
@@ -191,6 +194,7 @@ rename: ## Replace Custom Resource name
 	find controllers/*.go -exec sed -i "s/pulps/${CR_PLURAL}/g" {} \;
 	find controllers/*/*.go -exec sed -i "s/pulpbackup/${LOWER_CR_KIND}backup/g" {} \;
 	find controllers/*/*.go -exec sed -i "s/pulprestore/${LOWER_CR_KIND}restore/g" {} \;
+	find controllers/*/*.go -exec sed -i "s/pulpresources/${LOWER_CR_KIND}resources/g" {} \;
 	sed -i "s/default:=\"pulp\"/default:=\"${LOWER_CR_KIND}\"/" apis/repo-manager.pulpproject.org/v1beta2/pulp_types.go
 	sed -i "s|quay.io/pulp/pulp-minimal|${APP_IMAGE}|g" apis/repo-manager.pulpproject.org/v1beta2/pulp_types.go
 	sed -i "s|quay.io/pulp/pulp-web|${WEB_IMAGE}|g" apis/repo-manager.pulpproject.org/v1beta2/pulp_types.go
@@ -199,9 +203,11 @@ rename: ## Replace Custom Resource name
 	mv config/crd/bases/repo-manager.pulpproject.org_pulps.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${CR_PLURAL}.yaml
 	mv config/crd/bases/repo-manager.pulpproject.org_pulpbackups.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}backups.yaml
 	mv config/crd/bases/repo-manager.pulpproject.org_pulprestores.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}restores.yaml
+	mv config/crd/bases/repo-manager.pulpproject.org_pulpresources.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}resources.yaml
 	mv bundle/manifests/repo-manager.pulpproject.org_pulps.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${CR_PLURAL}.yaml
 	mv bundle/manifests/repo-manager.pulpproject.org_pulpbackups.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}backups.yaml
 	mv bundle/manifests/repo-manager.pulpproject.org_pulprestores.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}restores.yaml
+	mv bundle/manifests/repo-manager.pulpproject.org_pulpresources.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}resources.yaml
 	mv apis/repo-manager.pulpproject.org apis/repo-manager.${CR_DOMAIN}
 	sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" controllers/utils.go
 	mv config/samples/repo-manager.pulpproject.org_v1beta2_pulp.yaml config/samples/repo-manager.${CR_DOMAIN}_v1beta2_pulp.yaml

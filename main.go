@@ -28,6 +28,7 @@ import (
 	routev1 "github.com/openshift/api/route/v1"
 	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
 	repo_manager_backup "github.com/pulp/pulp-operator/controllers/backup"
+	repo_manager_pulp "github.com/pulp/pulp-operator/controllers/pulp_resources"
 	repo_manager "github.com/pulp/pulp-operator/controllers/repo_manager"
 	repo_manager_restore "github.com/pulp/pulp-operator/controllers/restore"
 	uzap "go.uber.org/zap"
@@ -166,6 +167,14 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "PulpRestore")
 		os.Exit(1)
 	}
+	if err = (&repo_manager_pulp.RepoManagerPulpResourceReconciler{
+		Client:    mgr.GetClient(),
+		RawLogger: mgr.GetLogger(),
+		Scheme:    mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "PulpResource")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
@@ -177,7 +186,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	setupLog.Info("pulp-operator version: 1.0.3-beta.5")
+	setupLog.Info("pulp-operator version: 1.0.4-beta.5")
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
