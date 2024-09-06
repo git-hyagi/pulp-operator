@@ -29,6 +29,13 @@ var (
 	HTTP_NOT_FOUND = errors.New("404: Not Found")
 
 	plugins = map[string]map[string]string{
+		"Ansible": {
+			"Repository":       PULP_ANSIBLE_REPO_ENDPOINT,
+			"Distribution":     PULP_ANSIBLE_DISTRIBUTION_ENDPOINT,
+			"CollectionRemote": PULP_ANSIBLE_COLLECTION_REMOTE_ENDPOINT,
+			"GitRemote":        PULP_ANSIBLE_GIT_REMOTE_ENDPOINT,
+			"RoleRemote":       PULP_ANSIBLE_ROLE_REMOTE_ENDPOINT,
+		},
 		"Container": {
 			"Repository":   PULP_CONTAINER_REPO_ENDPOINT,
 			"Distribution": PULP_CONTAINER_DISTRIBUTION_ENDPOINT,
@@ -62,11 +69,11 @@ type responseBody struct {
 	Results  []any
 }
 
-func get_api_svc(pulpName string) string {
+func getApiSvc(pulpName string) string {
 	return fmt.Sprintf("http://%s:24817", settings.ApiService(pulpName))
 }
 
-func get_credentials(ctx context.Context, r RepoManagerPulpResourceReconciler, pulpName, namespace string) string {
+func getCredentials(ctx context.Context, r RepoManagerPulpResourceReconciler, pulpName, namespace string) string {
 	pulp := &repomanagerpulpprojectorgv1beta2.Pulp{}
 	r.Get(ctx, types.NamespacedName{Name: pulpName, Namespace: namespace}, pulp)
 
@@ -77,7 +84,7 @@ func get_credentials(ctx context.Context, r RepoManagerPulpResourceReconciler, p
 	return string(secret.Data["password"])
 }
 
-func make_request(method, addr, user, pass string, body any) (responseBody, error) {
+func makeRequest(method, addr, user, pass string, body any) (responseBody, error) {
 	// todo: this config should come from pulpClient
 	client := &http.Client{
 		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
@@ -123,22 +130,22 @@ func make_request(method, addr, user, pass string, body any) (responseBody, erro
 	return *response, nil
 }
 
-// is_status_plugin_equals_to_spec compares the definitions of pulpresource.status and pulpresource.spec
-func is_status_plugin_equals_to_spec(pulpResource *repomanagerpulpprojectorgv1beta2.PulpResource, plugin string) bool {
+// isStatusPluginEqualsToSpec compares the definitions of pulpresource.status and pulpresource.spec
+func isStatusPluginEqualsToSpec(pulpResource *repomanagerpulpprojectorgv1beta2.PulpResource, plugin string) bool {
 	return reflect.DeepEqual(
 		reflect.ValueOf(*pulpResource).FieldByName("Status").Elem().FieldByName(plugin).Interface(),
 		reflect.ValueOf(*pulpResource).FieldByName("Spec").FieldByName(plugin).Interface())
 }
 
-// field_empty checks is a pulpresource field is defined
-func field_empty(field reflect.Value) bool {
+// fieldEmpty checks is a pulpresource field is defined
+func fieldEmpty(field reflect.Value) bool {
 	return !field.IsValid() || field.IsZero()
 }
 
-// resource_exists verifies if pulp resource already exists
-func resource_exists(pulpClient pulpClient, endpoint string, resource any) (responseBody, bool) {
+// resourceExists verifies if pulp resource already exists
+func resourceExists(pulpClient pulpClient, endpoint string, resource any) (responseBody, bool) {
 	// todo: pending handle errors (like 401, 403, etc)
-	response, err := make_request("GET", pulpClient.Address+endpoint, pulpClient.Username, pulpClient.Password, resource)
+	response, err := makeRequest("GET", pulpClient.Address+endpoint, pulpClient.Username, pulpClient.Password, resource)
 	if err != nil {
 		pulpClient.Log.Error(err, "Failed to make GET request to "+endpoint)
 	}
@@ -148,18 +155,18 @@ func resource_exists(pulpClient pulpClient, endpoint string, resource any) (resp
 	return response, false
 }
 
-// set_operator_label_to_resource will set pulp resource with a label to help identifying it is an operator managed resource
-func set_operator_label_to_resource(operatorLabels map[string]string, resourceValue *reflect.Value) {
+// setOperatorLabelToResource will set pulp resource with a label to help identifying it is an operator managed resource
+func setOperatorLabelToResource(operatorLabels map[string]string, resourceValue *reflect.Value) {
 	reflect.Indirect(*resourceValue).FieldByName("Labels").Set(reflect.ValueOf(operatorLabels))
 }
 
-// unset_operator_label_to_resource will remove the resource labels definitions
-func unset_operator_label_to_resource(resourceValue *reflect.Value) {
+// unsetOperatorLabelToResource will remove the resource labels definitions
+func unsetOperatorLabelToResource(resourceValue *reflect.Value) {
 	reflect.Indirect(*resourceValue).FieldByName("Labels").Set(reflect.ValueOf(map[string]string{}))
 }
 
-// create_status_fields creates the plugin and resource fields to be able to set them dinamically
-func create_status_fields(pulpResource *repomanagerpulpprojectorgv1beta2.PulpResource, plugin string, resource string) {
+// createStatusFields creates the plugin and resource fields to be able to set them dinamically
+func createStatusFields(pulpResource *repomanagerpulpprojectorgv1beta2.PulpResource, plugin string, resource string) {
 	pluginField := reflect.ValueOf(*pulpResource).FieldByName("Status").Elem().FieldByName(plugin)
 	if pluginField.IsNil() {
 		newField := reflect.New(reflect.ValueOf(*pulpResource).FieldByName("Spec").FieldByName(plugin).Elem().Type())
@@ -172,16 +179,16 @@ func create_status_fields(pulpResource *repomanagerpulpprojectorgv1beta2.PulpRes
 	}
 }
 
-// owned_by_operator will check, from a response body, if the resource is managed by pulp operator
-func owned_by_operator(response responseBody, owner string) bool {
+// ownedByOperator will check, from a response body, if the resource is managed by pulp operator
+func ownedByOperator(response responseBody, owner string) bool {
 	return response.Results[0].(map[string]interface{})["pulp_labels"].(map[string]interface{})["owner"] == owner
 }
 
 func getClientConfig(ctx context.Context, r RepoManagerPulpResourceReconciler, pulpResource repomanagerpulpprojectorgv1beta2.PulpResource) pulpClient {
 	pulpClient := pulpClient{
-		Address:  get_api_svc(pulpResource.Name),
+		Address:  getApiSvc(pulpResource.Name),
 		Username: PULP_ADMIN_USER,
-		Password: get_credentials(ctx, r, pulpResource.Name, pulpResource.Namespace),
+		Password: getCredentials(ctx, r, pulpResource.Name, pulpResource.Namespace),
 		Log:      r.RawLogger,
 		Context:  ctx,
 	}
@@ -196,7 +203,7 @@ func getClientConfig(ctx context.Context, r RepoManagerPulpResourceReconciler, p
 	return pulpClient
 }
 
-func (r RepoManagerPulpResourceReconciler) update_status_fields(pulpResource *repomanagerpulpprojectorgv1beta2.PulpResource, pulpClient pulpClient) *ctrl.Result {
+func (r RepoManagerPulpResourceReconciler) updateStatusFields(pulpResource *repomanagerpulpprojectorgv1beta2.PulpResource, pulpClient pulpClient) *ctrl.Result {
 	var wg sync.WaitGroup
 	for plugin, resource := range plugins {
 		wg.Add(1)
@@ -206,20 +213,22 @@ func (r RepoManagerPulpResourceReconciler) update_status_fields(pulpResource *re
 				// remove the resource from status.plugin.resource if it was removed from spec.plugin.resource
 				specPluginField := reflect.ValueOf(*pulpResource).FieldByName("Spec").FieldByName(plugin)
 				statusPluginField := reflect.ValueOf(*pulpResource).FieldByName("Status").Elem().FieldByName(plugin)
-				if field_empty(specPluginField) {
+				if fieldEmpty(specPluginField) {
 					statusPluginField.Set(reflect.Zero(statusPluginField.Type()))
 					continue
 				}
 
-				// remove the resource from status.plugin.resource if it was removed from spec.plugin.resource
 				specResourceField := specPluginField.Elem().FieldByName(resourceType)
-				if field_empty(specResourceField) {
-					statusResourceField := statusPluginField.Elem().FieldByName(resourceType)
-					statusResourceField.Set(reflect.Zero(statusResourceField.Type()))
+				if fieldEmpty(specResourceField) {
+					// remove the resource from status.plugin.resource if it was removed from spec.plugin.resource
+					if !fieldEmpty(statusPluginField) {
+						statusResourceField := statusPluginField.Elem().FieldByName(resourceType)
+						statusResourceField.Set(reflect.Zero(statusResourceField.Type()))
+					}
 					continue
 				}
 
-				create_status_fields(pulpResource, pluginName, resourceType)
+				createStatusFields(pulpResource, pluginName, resourceType)
 				statusPluginField.Elem().FieldByName(resourceType).Set(specResourceField)
 			}
 		}(plugin, resource)
@@ -234,6 +243,7 @@ func (r RepoManagerPulpResourceReconciler) update_status_fields(pulpResource *re
 func pulpResourceOwner(pulpResource repomanagerpulpprojectorgv1beta2.PulpResource) string {
 	return pulpResource.Namespace + "." + pulpResource.Name
 }
+
 func operatorLabels(pulpResource repomanagerpulpprojectorgv1beta2.PulpResource) map[string]string {
 	return map[string]string{
 		"owner": pulpResourceOwner(pulpResource),
@@ -271,13 +281,13 @@ func (r *RepoManagerPulpResourceReconciler) finalizePulpResource(pulpResource *r
 	for plugin, resource := range plugins {
 		// nothing to do if there is nothing defined for this plugin
 		pluginField := reflect.ValueOf(*pulpResource).FieldByName("Spec").FieldByName(plugin)
-		if field_empty(pluginField) {
+		if fieldEmpty(pluginField) {
 			continue
 		}
 		for resourceType, endpoint := range resource {
 			// nothing to do if there is nothing defined for this resource
 			resourceValue := reflect.Indirect(pluginField).FieldByName(resourceType)
-			if field_empty(resourceValue) {
+			if fieldEmpty(resourceValue) {
 				continue
 			}
 			deletePulpResource(pulpResource, plugin, resourceType, endpoint, pulpClient)
@@ -317,6 +327,7 @@ func indexerFunc(obj client.Object) []string {
 	return []string{}
 }
 
+// TODO: remove this function and adapt makeRequest instead
 func validatePulpConnection(pulpClient pulpClient) error {
 
 	client := &http.Client{

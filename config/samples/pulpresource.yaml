@@ -1,0 +1,66 @@
+### oc patch pulpresource pulp --type=merge -p '{"metadata": {"finalizers": null}}'
+---
+apiVersion: v1
+kind: Secret
+metadata:
+ name: 'client-config'
+stringData:
+ username: 'admin'
+ password: 'password'
+ address: 'http://localhost:24880'
+---
+apiVersion: repo-manager.pulpproject.org/v1beta2
+kind: PulpResource
+metadata:
+  name: pulp
+spec:
+  client_config: client-config
+
+  ansible:
+    sync: true
+    repository:
+      name: test-ansible
+    distribution:
+      name: test-ansible
+      base_path: test-ansible
+    collection_remote:
+      name: test-ansible
+      url: "https://galaxy-dev.ansible.com/"
+      requirements_file: "collections:\n  - testing.ansible_testing_content"
+
+  file:
+    sync: true
+    repository:
+      name: test-file
+      autopublish: true
+    distribution:
+      name: test-file
+      base_path: test-file
+    remote:
+      name: test-file
+      url: 'https://fixtures.pulpproject.org/file/PULP_MANIFEST'
+
+  container:
+    sync: true
+    repository:
+      name: test-container
+    distribution:
+      name: test-container
+      base_path: test-container
+    remote:
+      name: test-container
+      url: "https://ghcr.io"
+      upstream_name: pulp/test-fixture-1
+
+  rpm:
+    sync: true
+    repository:
+      name: test-rpm
+      autopublish: true
+    distribution:
+      name: test-rpm
+      base_path: test-rpm
+    remote:
+      name: test-rpm
+      url: 'https://fixtures.pulpproject.org/rpm-unsigned/'
+      policy: 'on_demand'

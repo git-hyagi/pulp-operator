@@ -25,9 +25,49 @@ import (
 // PulpResourceSpec defines the desired state of PulpResource
 type PulpResourceSpec struct {
 	ClientConfig *string              `json:"client_config,omitempty"`
+	Ansible      *PulpAnsiblePlugin   `json:"ansible,omitempty"`
 	Container    *PulpContainerPlugin `json:"container,omitempty"`
 	File         *PulpFilePlugin      `json:"file,omitempty"`
 	RPM          *PulpRPMPlugin       `json:"rpm,omitempty"`
+}
+
+type PulpAnsiblePlugin struct {
+	Repository       *PulpAnsibleRepository       `json:"repository,omitempty"`
+	Distribution     *PulpAnsibleDistribution     `json:"distribution,omitempty"`
+	RoleRemote       *PulpAnsibleRoleRemote       `json:"role_remote,omitempty"`
+	CollectionRemote *PulpAnsibleCollectionRemote `json:"collection_remote,omitempty"`
+	GitRemote        *PulpAnsibleGitRemote        `json:"git_remote,omitempty"`
+	Sync             *bool                        `json:"sync,omitempty"`
+}
+
+type PulpAnsibleRepository struct {
+	PulpCoreRepository `json:",inline"`
+	Gpgkey             string `json:"gpgkey,omitempty"`
+	Private            bool   `json:"private,omitempty"`
+}
+
+type PulpAnsibleDistribution struct {
+	PulpCoreDistribution `json:",inline"`
+	RepositoryVersion    int `json:"repository_version,omitempty"`
+}
+
+type PulpAnsibleRoleRemote struct {
+	PulpCoreRemote `json:",inline"`
+}
+
+type PulpAnsibleCollectionRemote struct {
+	PulpCoreRemote   `json:",inline"`
+	RequirementsFile string `json:"requirements_file,omitempty"`
+	AuthURL          string `json:"auth_url,omitempty"`
+	Token            string `json:"token,omitempty"`
+	SyncDependencies bool   `json:"sync_dependencies,omitempty"`
+	SignedOnly       bool   `json:"signed_only,omitempty"`
+}
+
+type PulpAnsibleGitRemote struct {
+	PulpCoreRemote `json:",inline"`
+	MetadataOnly   bool   `json:"metadata_only,omitempty"`
+	GitRef         string `json:"git_ref,omitempty"`
 }
 
 type PulpContainerPlugin struct {
@@ -108,7 +148,7 @@ type PulpRPMRemote struct {
 type PulpCoreRepository struct {
 	Description        string            `json:"description,omitempty"`
 	Remote             string            `json:"remote,omitempty"`
-	RetainRepoVersions int               `json:"retain-repo-versions,omitempty"`
+	RetainRepoVersions int               `json:"retain_repo_versions,omitempty"`
 	Labels             map[string]string `json:"pulp_labels,omitempty"`
 	Name               string            `json:"name"`
 }
@@ -133,11 +173,11 @@ type PulpCoreRemote struct {
 	ProxyPassword       string              `json:"proxy_password,omitempty"`
 	Username            string              `json:"username,omitempty"`
 	Password            string              `json:"password,omitempty"`
-	ConnectionTimeout   string              `json:"connection_timeout,omitempty"`
+	ConnectionTimeout   int                 `json:"connection_timeout,omitempty"`
 	DownloadConcurrency int                 `json:"download_concurrency,omitempty"`
 	RateLimit           int                 `json:"rate_limit,omitempty"`
-	SockConnectTimeout  string              `json:"sock_connect_timeout,omitempty"`
-	SockReadTimeout     string              `json:"sock_read_timeout,omitempty"`
+	SockConnectTimeout  int                 `json:"sock_connect_timeout,omitempty"`
+	SockReadTimeout     int                 `json:"sock_read_timeout,omitempty"`
 	MaxRetries          int                 `json:"max_retries,omitempty"`
 	Policy              string              `json:"policy,omitempty"`
 	TotalTimeout        string              `json:"total_timeout,omitempty"`
@@ -153,6 +193,7 @@ type PulpSync struct {
 
 // PulpResourceStatus defines the observed state of PulpResource
 type PulpResourceStatus struct {
+	Ansible   *PulpAnsiblePlugin   `json:"ansible,omitempty"`
 	Container *PulpContainerPlugin `json:"container,omitempty"`
 	File      *PulpFilePlugin      `json:"file,omitempty"`
 	RPM       *PulpRPMPlugin       `json:"rpm,omitempty"`

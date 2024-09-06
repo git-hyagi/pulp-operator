@@ -66,7 +66,7 @@ func (r *RepoManagerPulpResourceReconciler) Reconcile(ctx context.Context, req c
 	r.syncPulpResources(pulpResource, pulpClient)
 
 	r.pulpResourceFinalizer(ctx, *pulpResource, pulpClient)
-	if reconcile := r.update_status_fields(pulpResource, pulpClient); reconcile != nil {
+	if reconcile := r.updateStatusFields(pulpResource, pulpClient); reconcile != nil {
 		return *reconcile, nil
 	}
 	log.Info("PulpResource " + pulpResource.Name + " synced")
