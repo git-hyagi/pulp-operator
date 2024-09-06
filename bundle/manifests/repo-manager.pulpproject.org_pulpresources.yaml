@@ -39,6 +39,224 @@ spec:
           spec:
             description: PulpResourceSpec defines the desired state of PulpResource
             properties:
+              ansible:
+                properties:
+                  collection_remote:
+                    properties:
+                      auth_url:
+                        type: string
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: integer
+                      download_concurrency:
+                        type: integer
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      requirements_file:
+                        type: string
+                      signed_only:
+                        type: boolean
+                      sock_connect_timeout:
+                        type: integer
+                      sock_read_timeout:
+                        type: integer
+                      sync_dependencies:
+                        type: boolean
+                      tls_validation:
+                        type: boolean
+                      token:
+                        type: string
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  distribution:
+                    properties:
+                      base_path:
+                        type: string
+                      content-guard:
+                        type: string
+                      name:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      repository:
+                        type: string
+                      repository_version:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  git_remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: integer
+                      download_concurrency:
+                        type: integer
+                      git_ref:
+                        type: string
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      metadata_only:
+                        type: boolean
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sock_connect_timeout:
+                        type: integer
+                      sock_read_timeout:
+                        type: integer
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  repository:
+                    properties:
+                      description:
+                        type: string
+                      gpgkey:
+                        type: string
+                      name:
+                        type: string
+                      private:
+                        type: boolean
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      remote:
+                        type: string
+                      retain_repo_versions:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  role_remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: integer
+                      download_concurrency:
+                        type: integer
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sock_connect_timeout:
+                        type: integer
+                      sock_read_timeout:
+                        type: integer
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  sync:
+                    type: boolean
+                type: object
               client_config:
                 type: string
               container:
@@ -73,7 +291,7 @@ spec:
                       client_key:
                         type: string
                       connection_timeout:
-                        type: string
+                        type: integer
                       download_concurrency:
                         type: integer
                       exclude_tags:
@@ -113,9 +331,9 @@ spec:
                       sigstore:
                         type: string
                       sock_connect_timeout:
-                        type: string
+                        type: integer
                       sock_read_timeout:
-                        type: string
+                        type: integer
                       tls_validation:
                         type: boolean
                       total_timeout:
@@ -141,7 +359,7 @@ spec:
                         type: object
                       remote:
                         type: string
-                      retain-repo-versions:
+                      retain_repo_versions:
                         type: integer
                     required:
                     - name
@@ -179,7 +397,7 @@ spec:
                       client_key:
                         type: string
                       connection_timeout:
-                        type: string
+                        type: integer
                       download_concurrency:
                         type: integer
                       headers:
@@ -209,9 +427,9 @@ spec:
                       rate_limit:
                         type: integer
                       sock_connect_timeout:
-                        type: string
+                        type: integer
                       sock_read_timeout:
-                        type: string
+                        type: integer
                       tls_validation:
                         type: boolean
                       total_timeout:
@@ -239,7 +457,7 @@ spec:
                         type: object
                       remote:
                         type: string
-                      retain-repo-versions:
+                      retain_repo_versions:
                         type: integer
                     required:
                     - name
@@ -279,7 +497,7 @@ spec:
                       client_key:
                         type: string
                       connection_timeout:
-                        type: string
+                        type: integer
                       download_concurrency:
                         type: integer
                       headers:
@@ -311,9 +529,9 @@ spec:
                       sles_auth_token:
                         type: string
                       sock_connect_timeout:
-                        type: string
+                        type: integer
                       sock_read_timeout:
-                        type: string
+                        type: integer
                       tls_validation:
                         type: boolean
                       total_timeout:
@@ -349,7 +567,7 @@ spec:
                         type: string
                       retain-package-vesions:
                         type: integer
-                      retain-repo-versions:
+                      retain_repo_versions:
                         type: integer
                     required:
                     - name
@@ -361,6 +579,224 @@ spec:
           status:
             description: PulpResourceStatus defines the observed state of PulpResource
             properties:
+              ansible:
+                properties:
+                  collection_remote:
+                    properties:
+                      auth_url:
+                        type: string
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: integer
+                      download_concurrency:
+                        type: integer
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      requirements_file:
+                        type: string
+                      signed_only:
+                        type: boolean
+                      sock_connect_timeout:
+                        type: integer
+                      sock_read_timeout:
+                        type: integer
+                      sync_dependencies:
+                        type: boolean
+                      tls_validation:
+                        type: boolean
+                      token:
+                        type: string
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  distribution:
+                    properties:
+                      base_path:
+                        type: string
+                      content-guard:
+                        type: string
+                      name:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      repository:
+                        type: string
+                      repository_version:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  git_remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: integer
+                      download_concurrency:
+                        type: integer
+                      git_ref:
+                        type: string
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      metadata_only:
+                        type: boolean
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sock_connect_timeout:
+                        type: integer
+                      sock_read_timeout:
+                        type: integer
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  repository:
+                    properties:
+                      description:
+                        type: string
+                      gpgkey:
+                        type: string
+                      name:
+                        type: string
+                      private:
+                        type: boolean
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      remote:
+                        type: string
+                      retain_repo_versions:
+                        type: integer
+                    required:
+                    - name
+                    type: object
+                  role_remote:
+                    properties:
+                      ca_cert:
+                        type: string
+                      client_cert:
+                        type: string
+                      client_key:
+                        type: string
+                      connection_timeout:
+                        type: integer
+                      download_concurrency:
+                        type: integer
+                      headers:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      max_retries:
+                        type: integer
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      policy:
+                        type: string
+                      proxy_password:
+                        type: string
+                      proxy_url:
+                        type: string
+                      proxy_username:
+                        type: string
+                      pulp_labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      rate_limit:
+                        type: integer
+                      sock_connect_timeout:
+                        type: integer
+                      sock_read_timeout:
+                        type: integer
+                      tls_validation:
+                        type: boolean
+                      total_timeout:
+                        type: string
+                      url:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  sync:
+                    type: boolean
+                type: object
               container:
                 properties:
                   distribution:
@@ -393,7 +829,7 @@ spec:
                       client_key:
                         type: string
                       connection_timeout:
-                        type: string
+                        type: integer
                       download_concurrency:
                         type: integer
                       exclude_tags:
@@ -433,9 +869,9 @@ spec:
                       sigstore:
                         type: string
                       sock_connect_timeout:
-                        type: string
+                        type: integer
                       sock_read_timeout:
-                        type: string
+                        type: integer
                       tls_validation:
                         type: boolean
                       total_timeout:
@@ -461,7 +897,7 @@ spec:
                         type: object
                       remote:
                         type: string
-                      retain-repo-versions:
+                      retain_repo_versions:
                         type: integer
                     required:
                     - name
@@ -499,7 +935,7 @@ spec:
                       client_key:
                         type: string
                       connection_timeout:
-                        type: string
+                        type: integer
                       download_concurrency:
                         type: integer
                       headers:
@@ -529,9 +965,9 @@ spec:
                       rate_limit:
                         type: integer
                       sock_connect_timeout:
-                        type: string
+                        type: integer
                       sock_read_timeout:
-                        type: string
+                        type: integer
                       tls_validation:
                         type: boolean
                       total_timeout:
@@ -559,7 +995,7 @@ spec:
                         type: object
                       remote:
                         type: string
-                      retain-repo-versions:
+                      retain_repo_versions:
                         type: integer
                     required:
                     - name
@@ -599,7 +1035,7 @@ spec:
                       client_key:
                         type: string
                       connection_timeout:
-                        type: string
+                        type: integer
                       download_concurrency:
                         type: integer
                       headers:
@@ -631,9 +1067,9 @@ spec:
                       sles_auth_token:
                         type: string
                       sock_connect_timeout:
-                        type: string
+                        type: integer
                       sock_read_timeout:
-                        type: string
+                        type: integer
                       tls_validation:
                         type: boolean
                       total_timeout:
@@ -669,7 +1105,7 @@ spec:
                         type: string
                       retain-package-vesions:
                         type: integer
-                      retain-repo-versions:
+                      retain_repo_versions:
                         type: integer
                     required:
                     - name
