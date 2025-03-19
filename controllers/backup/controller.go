@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -57,7 +57,7 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 	log := r.RawLogger
 
 	formattedCurrentTime := time.Now().Format("2006-01-02-150405")
-	pulpBackup := &repomanagerpulpprojectorgv1beta2.PulpBackup{}
+	pulpBackup := &pulpv1.PulpBackup{}
 	err := r.Get(ctx, req.NamespacedName, pulpBackup)
 
 	if err != nil {
@@ -158,7 +158,7 @@ func (r *RepoManagerBackupReconciler) waitPodReady(ctx context.Context, namespac
 }
 
 // createBackupPod provisions the backup-manager pod where the backup steps will run
-func (r *RepoManagerBackupReconciler) createBackupPod(ctx context.Context, pulpBackup *repomanagerpulpprojectorgv1beta2.PulpBackup, backupDir string) (*corev1.Pod, error) {
+func (r *RepoManagerBackupReconciler) createBackupPod(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string) (*corev1.Pod, error) {
 	log := r.RawLogger
 
 	deploymentName := getDeploymentName(ctx, pulpBackup)
@@ -168,7 +168,7 @@ func (r *RepoManagerBackupReconciler) createBackupPod(ctx context.Context, pulpB
 	// we are considering that pulp CR instance is running in the same namespace as pulpbackup and
 	// that there is only a single instance of pulp CR available
 	// we could also let users pass the name of pulp instance
-	pulp := &repomanagerpulpprojectorgv1beta2.Pulp{}
+	pulp := &pulpv1.Pulp{}
 	err := r.Get(ctx, types.NamespacedName{Name: deploymentName, Namespace: pulpBackup.Namespace}, pulp)
 	if err != nil {
 		log.Error(err, "Failed to get Pulp")
@@ -304,7 +304,7 @@ func (r *RepoManagerBackupReconciler) createBackupPod(ctx context.Context, pulpB
 }
 
 // cleanup deletes the backup-manager pod
-func (r *RepoManagerBackupReconciler) cleanup(ctx context.Context, pulpBackup *repomanagerpulpprojectorgv1beta2.PulpBackup) error {
+func (r *RepoManagerBackupReconciler) cleanup(ctx context.Context, pulpBackup *pulpv1.PulpBackup) error {
 	bkpPod := &corev1.Pod{}
 	r.Get(ctx, types.NamespacedName{Name: pulpBackup.Name + "-backup-manager", Namespace: pulpBackup.Namespace}, bkpPod)
 	r.Delete(ctx, bkpPod)
@@ -323,7 +323,7 @@ func (r *RepoManagerBackupReconciler) cleanup(ctx context.Context, pulpBackup *r
 }
 
 // createBackupPVC provisions the pulp-backup-claim PVC that will store the backup
-func (r *RepoManagerBackupReconciler) createBackupPVC(ctx context.Context, pulpBackup *repomanagerpulpprojectorgv1beta2.PulpBackup) error {
+func (r *RepoManagerBackupReconciler) createBackupPVC(ctx context.Context, pulpBackup *pulpv1.PulpBackup) error {
 	log := r.RawLogger
 
 	backupPVC := getBackupPVC(ctx, pulpBackup)
@@ -388,7 +388,7 @@ func (r *RepoManagerBackupReconciler) createBackupPVC(ctx context.Context, pulpB
 }
 
 // updateStatus modifies a .status.condition from pulpbackup CR
-func (r *RepoManagerBackupReconciler) updateStatus(ctx context.Context, pulpBackup *repomanagerpulpprojectorgv1beta2.PulpBackup, conditionStatus metav1.ConditionStatus, conditionType, conditionMessage, conditionReason string) {
+func (r *RepoManagerBackupReconciler) updateStatus(ctx context.Context, pulpBackup *pulpv1.PulpBackup, conditionStatus metav1.ConditionStatus, conditionType, conditionMessage, conditionReason string) {
 	v1.SetStatusCondition(&pulpBackup.Status.Conditions, metav1.Condition{
 		Type:               conditionType,
 		Status:             conditionStatus,
@@ -402,7 +402,7 @@ func (r *RepoManagerBackupReconciler) updateStatus(ctx context.Context, pulpBack
 // SetupWithManager sets up the controller with the Manager.
 func (r *RepoManagerBackupReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&repomanagerpulpprojectorgv1beta2.PulpBackup{}).
+		For(&pulpv1.PulpBackup{}).
 		WithEventFilter(controllers.IgnoreUpdateCRStatusPredicate()).
 		Complete(r)
 }

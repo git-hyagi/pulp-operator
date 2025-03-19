@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +kubebuilder:unservedversion
-package v1beta2
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -70,6 +69,7 @@ type PulpRestoreStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:storageversion
 
 // PulpRestore is the Schema for the pulprestores API
 type PulpRestore struct {

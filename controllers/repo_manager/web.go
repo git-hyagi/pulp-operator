@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
 	"golang.org/x/text/cases"
@@ -37,7 +37,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *RepoManagerReconciler) pulpWebController(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, log logr.Logger) (ctrl.Result, error) {
+func (r *RepoManagerReconciler) pulpWebController(ctx context.Context, pulp *pulpv1.Pulp, log logr.Logger) (ctrl.Result, error) {
 	funcResources := controllers.FunctionResources{Context: ctx, Client: r.Client, Pulp: pulp, Scheme: r.Scheme, Logger: log}
 
 	// conditionType is used to update .status.conditions with the current resource state
@@ -138,7 +138,7 @@ func (r *RepoManagerReconciler) pulpWebController(ctx context.Context, pulp *rep
 }
 
 // deploymentForPulpWeb returns a pulp-web Deployment object
-func (r *RepoManagerReconciler) deploymentForPulpWeb(m *repomanagerpulpprojectorgv1beta2.Pulp, funcResources controllers.FunctionResources) *appsv1.Deployment {
+func (r *RepoManagerReconciler) deploymentForPulpWeb(m *pulpv1.Pulp, funcResources controllers.FunctionResources) *appsv1.Deployment {
 
 	ls := labelsForPulpWeb(m)
 	replicas := m.Spec.Web.Replicas
@@ -270,12 +270,12 @@ func (r *RepoManagerReconciler) deploymentForPulpWeb(m *repomanagerpulpprojector
 
 // labelsForPulpWeb returns the labels for selecting the resources
 // belonging to the given pulp CR name.
-func labelsForPulpWeb(m *repomanagerpulpprojectorgv1beta2.Pulp) map[string]string {
+func labelsForPulpWeb(m *pulpv1.Pulp) map[string]string {
 	return settings.PulpcoreLabels(*m, "web")
 }
 
 // serviceForPulpWeb returns a service object for pulp-web
-func serviceForPulpWeb(m *repomanagerpulpprojectorgv1beta2.Pulp) *corev1.Service {
+func serviceForPulpWeb(m *pulpv1.Pulp) *corev1.Service {
 	annotations := m.Spec.Web.ServiceAnnotations
 
 	var serviceType corev1.ServiceType
@@ -349,7 +349,7 @@ func serviceForPulpWeb(m *repomanagerpulpprojectorgv1beta2.Pulp) *corev1.Service
 }
 
 // wouldn't it be better to handle the configmap content by loading it from a file?
-func (r *RepoManagerReconciler) pulpWebConfigMap(m *repomanagerpulpprojectorgv1beta2.Pulp) *corev1.ConfigMap {
+func (r *RepoManagerReconciler) pulpWebConfigMap(m *pulpv1.Pulp) *corev1.ConfigMap {
 
 	// Nginx default values
 	nginxProxyReadTimeout := m.Spec.NginxProxyReadTimeout

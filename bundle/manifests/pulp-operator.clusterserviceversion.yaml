@@ -5,7 +5,7 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "repo-manager.pulpproject.org/v1beta2",
+          "apiVersion": "repo-manager.pulpproject.org/v1",
           "kind": "Pulp",
           "metadata": {
             "name": "example"
@@ -30,16 +30,13 @@ metadata:
                 }
               }
             },
-            "ingress_type": "nodeport",
-            "pulp_settings": {
-              "allowed_export_paths": [
-                "/tmp"
-              ],
-              "allowed_import_paths": [
-                "/tmp"
-              ],
-              "api_root": "/pulp/"
+            "database": {
+              "postgres_storage_class": "standard"
             },
+            "file_storage_access_mode": "ReadWriteOnce",
+            "file_storage_size": "2Gi",
+            "file_storage_storage_class": "standard",
+            "ingress_type": "nodeport",
             "worker": {
               "replicas": 2,
               "resource_requirements": {
@@ -56,91 +53,7 @@ metadata:
           }
         },
         {
-          "apiVersion": "repo-manager.pulpproject.org/v1beta2",
-          "kind": "Pulp",
-          "metadata": {
-            "name": "galaxy-example"
-          },
-          "spec": {
-            "admin_password_secret": "example-pulp-admin-password",
-            "api": {
-              "replicas": 1
-            },
-            "content": {
-              "replicas": 1,
-              "resource_requirements": {
-                "limits": {
-                  "cpu": "800m",
-                  "memory": "1Gi"
-                },
-                "requests": {
-                  "cpu": "150m",
-                  "memory": "256Mi"
-                }
-              }
-            },
-            "database": {
-              "postgres_storage_class": "standard"
-            },
-            "deployment_type": "galaxy",
-            "file_storage_access_mode": "ReadWriteMany",
-            "file_storage_size": "10Gi",
-            "file_storage_storage_class": "standard",
-            "image": "quay.io/pulp/galaxy-minimal",
-            "image_version": "4.6.3",
-            "image_web": "quay.io/pulp/galaxy-web",
-            "image_web_version": "4.6.3",
-            "ingress_type": "nodeport",
-            "nodeport_port": 30000,
-            "pulp_settings": {
-              "allowed_export_paths": [
-                "/tmp"
-              ],
-              "allowed_import_paths": [
-                "/tmp"
-              ],
-              "analytics": false,
-              "ansible_api_hostname": "http://nodeport.local:30000",
-              "api_root": "/api/galaxy/pulp/",
-              "content_origin": "http://nodeport.local:30000",
-              "galaxy_feature_flags": {
-                "ai_deny_index": true,
-                "execution_environments": true
-              },
-              "token_server": "http://nodeport.local:30000/token/"
-            },
-            "signing_scripts": "signing-scripts",
-            "signing_secret": "signing-galaxy",
-            "web": {
-              "replicas": 1,
-              "resource_requirements": {
-                "limits": {
-                  "cpu": "800m",
-                  "memory": "1Gi"
-                },
-                "requests": {
-                  "cpu": "100m",
-                  "memory": "256Mi"
-                }
-              }
-            },
-            "worker": {
-              "replicas": 1,
-              "resource_requirements": {
-                "limits": {
-                  "cpu": "800m",
-                  "memory": "1Gi"
-                },
-                "requests": {
-                  "cpu": "150m",
-                  "memory": "256Mi"
-                }
-              }
-            }
-          }
-        },
-        {
-          "apiVersion": "repo-manager.pulpproject.org/v1beta2",
+          "apiVersion": "repo-manager.pulpproject.org/v1",
           "kind": "PulpBackup",
           "metadata": {
             "name": "pulpbackup-sample"
@@ -154,7 +67,7 @@ metadata:
           }
         },
         {
-          "apiVersion": "repo-manager.pulpproject.org/v1beta2",
+          "apiVersion": "repo-manager.pulpproject.org/v1",
           "kind": "PulpRestore",
           "metadata": {
             "name": "ci-pulprestore"
@@ -168,7 +81,7 @@ metadata:
     capabilities: Full Lifecycle
     categories: Integration & Delivery
     containerImage: quay.io/pulp/pulp-operator:devel
-    createdAt: "2024-12-26T14:04:35Z"
+    createdAt: "2025-03-19T23:08:29Z"
     description: Pulp is a platform for managing repositories of software packages
       and making them available to a large number of consumers.
     operators.operatorframework.io/builder: operator-sdk-v1.29.0
@@ -245,7 +158,7 @@ spec:
       - description: Name of the deployment backed up
         displayName: Deployment Name
         path: deploymentName
-      version: v1beta2
+      version: v1
     - description: PulpRestore is the Schema for the pulprestores API
       displayName: Pulp Restore
       kind: PulpRestore
@@ -280,7 +193,7 @@ spec:
         - urn:alm:descriptor:io.kubernetes.conditions
       - displayName: Postgres Secret
         path: postgres_secret
-      version: v1beta2
+      version: v1
     - description: Pulp is the Schema for the pulps API
       displayName: Pulp
       kind: Pulp
@@ -947,13 +860,6 @@ spec:
         path: pulp_secret_key
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:hidden
-      - description: '[DEPRECATED] Definition of /etc/pulp/settings.py config file.
-          This field is deprecated and will be removed in the future, use the custom_pulp_settings
-          field instead.'
-        displayName: Pulp Settings
-        path: pulp_settings
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: PersistenVolumeClaim name that will be used by Pulp pods. If
           defined, the PVC must be provisioned by the user and the operator will only
           configure the deployment to use it
@@ -1018,14 +924,6 @@ spec:
         path: signing_scripts
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: '[DEPRECATED] ConfigMap where the signing scripts are stored.
-          This field is deprecated and will be removed in the future, use the signing_scripts
-          field instead.'
-        displayName: Signing Scripts Configmap
-        path: signing_scripts_configmap
-        x-descriptors:
-        - urn:alm:descriptor:io.kubernetes:ConfigMap
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Name of the Secret where the gpg key is stored.
         displayName: Signing Secret
@@ -1200,7 +1098,7 @@ spec:
         path: conditions
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes.conditions
-      version: v1beta2
+      version: v1
   description: |-
     [Pulp](https://pulpproject.org/) is a platform for managing repositories of content, such as software packages, and making them available to a large number of consumers.
 
@@ -1232,7 +1130,6 @@ spec:
     |           | Operator | Main | Web |
     | --------- | -------- | ---- | --- |
     | **Image** | [pulp-operator](https://quay.io/repository/pulp/pulp-operator?tab=tags) |[pulp-minimal](https://quay.io/repository/pulp/pulp-minimal?tab=tags) | [pulp-web](https://quay.io/repository/pulp/pulp-web?tab=tags) |
-    | **Image** | [pulp-operator](https://quay.io/repository/pulp/pulp-operator?tab=tags) |[galaxy-minimal](https://quay.io/repository/pulp/galaxy-minimal?tab=tags) | [galaxy-web](https://quay.io/repository/pulp/galaxy-web?tab=tags) |
 
     <br>Pulp operator is manually built and [hosted on quay.io](https://quay.io/repository/pulp/pulp-operator). Read more about the container images [here](https://docs.pulpproject.org/pulp_operator/container/).
 
@@ -1555,7 +1452,7 @@ spec:
   maintainers:
   - email: pulp-list@redhat.com
     name: Pulp Community
-  maturity: beta
+  maturity: stable
   provider:
     name: Pulp Community
     url: https://github.com/pulp/pulp-operator

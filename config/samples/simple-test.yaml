@@ -1,4 +1,19 @@
-apiVersion: repo-manager.pulpproject.org/v1beta2
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: settings
+data:
+  analytics: "False"
+  token_server: '"http://nodeport.local:30000/token/"'
+  content_origin: '"http://nodeport.local:30000"'
+  ansible_api_hostname: '"http://nodeport.local:30000"'
+  api_root: '"/pulp/"'
+  allowed_export_paths: '[ "/tmp" ]'
+  allowed_import_paths: '[ "/tmp" ]'
+
+---
+apiVersion: repo-manager.pulpproject.org/v1
 kind: Pulp
 metadata:
   name: test-pulp
@@ -40,14 +55,4 @@ spec:
   ingress_type: nodeport
   nodeport_port: 30001
 
-  pulp_settings:
-    api_root: "/pulp/"
-    allowed_export_paths:
-      - /tmp
-    allowed_import_paths:
-      - /tmp
-    telemetry: false
-    token_server: http://nodeport.local:30001/token/
-    content_origin: http://nodeport.local:30001
-    ansible_api_hostname: http://nodeport.local:30001
-
+  custom_pulp_settings: settings

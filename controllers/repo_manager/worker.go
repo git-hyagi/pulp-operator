@@ -20,7 +20,7 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
 	"golang.org/x/text/cases"
@@ -33,7 +33,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *RepoManagerReconciler) pulpWorkerController(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, log logr.Logger) (ctrl.Result, error) {
+func (r *RepoManagerReconciler) pulpWorkerController(ctx context.Context, pulp *pulpv1.Pulp, log logr.Logger) (ctrl.Result, error) {
 
 	// conditionType is used to update .status.conditions with the current resource state
 	conditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Worker-Ready"
@@ -72,7 +72,7 @@ func (r *RepoManagerReconciler) pulpWorkerController(ctx context.Context, pulp *
 
 // TODO: the ipv6 incompatibility should be handled by oci-image.
 // Remove this function after updating the image.
-func (r *RepoManagerReconciler) createProbeConfigMap(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, conditionType string) (*ctrl.Result, error) {
+func (r *RepoManagerReconciler) createProbeConfigMap(ctx context.Context, pulp *pulpv1.Pulp, conditionType string) (*ctrl.Result, error) {
 
 	if !controllers.Ipv6Disabled(*pulp) {
 		return nil, nil

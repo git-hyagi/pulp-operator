@@ -3,14 +3,14 @@ package repo_manager_backup
 import (
 	"context"
 
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
 // backupDatabase runs a pg_dump inside backup-manager pod and store it in backup PVC
-func (r *RepoManagerBackupReconciler) backupDatabase(ctx context.Context, pulpBackup *repomanagerpulpprojectorgv1beta2.PulpBackup, backupDir string, pod *corev1.Pod) error {
+func (r *RepoManagerBackupReconciler) backupDatabase(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
 	backupFile := "pulp.db"
 	postgresConfigurationSecret := getPostgresCfgSecret(ctx, pulpBackup)

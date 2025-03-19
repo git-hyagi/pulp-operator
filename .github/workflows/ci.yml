@@ -239,11 +239,11 @@ jobs:
         run: minikube -p minikube docker-env | grep "export" | sed 's/export //' | sed 's/"//g' >> $GITHUB_ENV
       - name: Install Pulp Operator
         run: |
-          make docker-build IMG=localhost/pulp-operator:devel
+          make docker-build install IMG=localhost/pulp-operator:devel
           kubectl create ns pulp-operator-system
           kubectl config set-context --current --namespace=pulp-operator-system
           helm repo add pulp-operator https://github.com/pulp/pulp-k8s-resources/raw/main/helm-charts/ --force-update
-          helm install --set namespace=pulp-operator-system --set image=localhost/pulp-operator:devel pulp pulp-operator/pulp-operator
+          helm install --skip-crds --set namespace=pulp-operator-system --set image=localhost/pulp-operator:devel pulp pulp-operator/pulp-operator
           kubectl apply -f .ci/assets/kubernetes/pulp-admin-password.secret.yaml
           kubectl apply -f config/samples/simple.yaml
         shell: bash
@@ -325,14 +325,6 @@ jobs:
         run: kubectl get pods -A
       - name: Setup a minikube docker env
         run: minikube -p minikube docker-env | grep "export" | sed 's/export //' | sed 's/"//g' >> $GITHUB_ENV
-      - name: Uninstalling GHA kustomize
-        run: |
-          # hack for uninstalling kustomize from GHA
-          mv /usr/local/bin/kustomize /usr/local/bin/ghakustomize
-          make kustomize
-          mv ./bin/kustomize /usr/local/bin/kustomize
-          kustomize version
-        shell: bash
       - name: Check code format and generate manifests
         run: |
           make manifests generate fmt vet
@@ -431,14 +423,6 @@ jobs:
         run: kubectl get pods -A
       - name: Setup a minikube docker env
         run: minikube -p minikube docker-env | grep "export" | sed 's/export //' | sed 's/"//g' >> $GITHUB_ENV
-      - name: Uninstalling GHA kustomize
-        run: |
-          # hack for uninstalling kustomize from GHA
-          mv /usr/local/bin/kustomize /usr/local/bin/ghakustomize
-          make kustomize
-          mv ./bin/kustomize /usr/local/bin/kustomize
-          kustomize version
-        shell: bash
       - name: Check code format and generate manifests
         run: |
           make manifests generate fmt vet
@@ -534,14 +518,6 @@ jobs:
         run: kubectl get pods -A
       - name: Setup a minikube docker env
         run: minikube -p minikube docker-env | grep "export" | sed 's/export //' | sed 's/"//g' >> $GITHUB_ENV
-      - name: Uninstalling GHA kustomize
-        run: |
-          # hack for uninstalling kustomize from GHA
-          mv /usr/local/bin/kustomize /usr/local/bin/ghakustomize
-          make kustomize
-          mv ./bin/kustomize /usr/local/bin/kustomize
-          kustomize version
-        shell: bash
       - name: Rename kind to Galaxy
         run: make rename manifests bundle generate CR_KIND=Galaxy CR_DOMAIN=ansible.com CR_PLURAL=galaxies APP_IMAGE=quay.io/pulp/galaxy-minimal WEB_IMAGE=quay.io/pulp/galaxy-web
       - name: Check code format and generate manifests
@@ -675,14 +651,6 @@ jobs:
         run: kubectl get pods -A
       - name: Setup a minikube docker env
         run: minikube -p minikube docker-env | grep "export" | sed 's/export //' | sed 's/"//g' >> $GITHUB_ENV
-      - name: Uninstalling GHA kustomize
-        run: |
-          # hack for uninstalling kustomize from GHA
-          mv /usr/local/bin/kustomize /usr/local/bin/ghakustomize
-          make kustomize
-          mv ./bin/kustomize /usr/local/bin/kustomize
-          kustomize version
-        shell: bash
       - name: Prepare Object Storage
         run: |
           .ci/scripts/prepare-object-storage.sh
@@ -770,14 +738,6 @@ jobs:
           echo ::endgroup::
           echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
           echo "CI_TEST=true" >> $GITHUB_ENV
-        shell: bash
-      - name: Uninstalling GHA kustomize
-        run: |
-          # hack for uninstalling kustomize from GHA
-          mv /usr/local/bin/kustomize /usr/local/bin/ghakustomize
-          make kustomize
-          mv ./bin/kustomize /usr/local/bin/kustomize
-          kustomize version
         shell: bash
       - name: Quay login
         env:

@@ -190,7 +190,6 @@ PulpSpec defines the desired state of Pulp
 | pvc | PersistenVolumeClaim name that will be used by Pulp pods. If defined, the PVC must be provisioned by the user and the operator will only configure the deployment to use it | string | false |
 | db_fields_encryption_secret | Secret where the Fernet symmetric encryption key is stored. Default: <operators's name>-\"-db-fields-encryption\" | string | false |
 | signing_secret | Name of the Secret where the gpg key is stored. | string | false |
-| signing_scripts_configmap | [DEPRECATED] ConfigMap where the signing scripts are stored. This field is deprecated and will be removed in the future, use the signing_scripts field instead. | string | false |
 | signing_scripts | Name of the Secret where the signing scripts are stored. | string | false |
 | ingress_type | The ingress type to use to reach the deployed instance. Default: none (will not expose the service) | string | false |
 | ingress_annotations | Annotations for the Ingress | map[string]string | false |
@@ -222,7 +221,6 @@ PulpSpec defines the desired state of Pulp
 | worker | Worker defines desired state of pulpcore-worker resources | [Worker](#worker) | false |
 | web | Web defines desired state of pulpcore-web (reverse-proxy) resources | [Web](#web) | false |
 | cache | Cache defines desired state of redis resources | [Cache](#cache) | false |
-| pulp_settings | [DEPRECATED] Definition of /etc/pulp/settings.py config file. This field is deprecated and will be removed in the future, use the custom_pulp_settings field instead. | runtime.RawExtension | false |
 | custom_pulp_settings | Name of the ConfigMap to define Pulp configurations not available through this CR. | string | false |
 | image_web | The image name (repo name) for the pulp webserver image. Default: \"quay.io/pulp/pulp-web\" | string | false |
 | image_web_version | The image version for the pulp webserver image. Default: \"stable\" | string | false |

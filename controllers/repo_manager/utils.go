@@ -18,7 +18,7 @@ import (
 
 	"github.com/go-logr/logr"
 	routev1 "github.com/openshift/api/route/v1"
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	pulp_ocp "github.com/pulp/pulp-operator/controllers/ocp"
 	"github.com/pulp/pulp-operator/controllers/settings"
@@ -155,7 +155,7 @@ func checkSecretsAvailable(funcResources controllers.FunctionResources) error {
 
 // checkImmutableFields verifies if a user tried to modify an immutable field and rollback
 // the change if so
-func (r *RepoManagerReconciler) checkImmutableFields(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, field immutableField, log logr.Logger) bool {
+func (r *RepoManagerReconciler) checkImmutableFields(ctx context.Context, pulp *pulpv1.Pulp, field immutableField, log logr.Logger) bool {
 
 	fieldSpec := reflect.Value{}
 
@@ -163,9 +163,9 @@ func (r *RepoManagerReconciler) checkImmutableFields(ctx context.Context, pulp *
 	// for fieldSpec we need to pass it as a reference because we will need to change
 	// its value back in case of immutable field
 	switch field.FieldPath.(type) {
-	case repomanagerpulpprojectorgv1beta2.PulpSpec:
+	case pulpv1.PulpSpec:
 		fieldSpec = reflect.Indirect(reflect.ValueOf(&pulp.Spec)).FieldByName(field.FieldName)
-	case repomanagerpulpprojectorgv1beta2.Cache:
+	case pulpv1.Cache:
 		fieldSpec = reflect.Indirect(reflect.ValueOf(&pulp.Spec.Cache)).FieldByName(field.FieldName)
 	}
 
@@ -197,7 +197,7 @@ func (r *RepoManagerReconciler) checkImmutableFields(ctx context.Context, pulp *
 
 // updateIngressType will check the current definition of ingress_type and will handle the different
 // modification scenarios
-func (r *RepoManagerReconciler) updateIngressType(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) {
+func (r *RepoManagerReconciler) updateIngressType(ctx context.Context, pulp *pulpv1.Pulp) {
 
 	// if pulp CR was defined with route and user modified it to anything else
 	// delete all routes with operator's labels
@@ -273,7 +273,7 @@ func (r *RepoManagerReconciler) updateIngressType(ctx context.Context, pulp *rep
 
 // updateIngressClass will check the current definition of ingress_class_name and will handle the different
 // modification scenarios
-func (r *RepoManagerReconciler) updateIngressClass(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) {
+func (r *RepoManagerReconciler) updateIngressClass(ctx context.Context, pulp *pulpv1.Pulp) {
 
 	// if the new one uses nginx controller
 	if r.isNginxIngress(pulp) {
@@ -323,7 +323,7 @@ type ResourceDefinition struct {
 	// ConditionType is used to update .status.conditions with the current resource state
 	ConditionType string
 	// Pulp is the Schema for the pulps API
-	*repomanagerpulpprojectorgv1beta2.Pulp
+	*pulpv1.Pulp
 }
 
 // createPulpResource executes a set of instructions to provision Pulp resources
@@ -401,22 +401,22 @@ func needsRequeue(err error, pulpController ctrl.Result) bool {
 
 // needsPulpWeb will return true if ingress_type is not route and the ingress_type provided does not
 // support nginx controller, which is a scenario where pulp-web should be deployed
-func (r *RepoManagerReconciler) needsPulpWeb(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func (r *RepoManagerReconciler) needsPulpWeb(pulp *pulpv1.Pulp) bool {
 	return !isRoute(pulp) && !controllers.IsNginxIngressSupported(pulp)
 }
 
 // isNginxIngress will check if ingress_type is defined as "ingress"
-func isIngress(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func isIngress(pulp *pulpv1.Pulp) bool {
 	return strings.ToLower(pulp.Spec.IngressType) == "ingress"
 }
 
 // isRoute will check if ingress_type is defined as "route"
-func isRoute(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func isRoute(pulp *pulpv1.Pulp) bool {
 	return strings.ToLower(pulp.Spec.IngressType) == "route"
 }
 
 // isNginxIngress returns true if pulp is defined with ingress_type==ingress and the controller of the ingresclass provided is a nginx
-func (r *RepoManagerReconciler) isNginxIngress(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func (r *RepoManagerReconciler) isNginxIngress(pulp *pulpv1.Pulp) bool {
 	return isIngress(pulp) && controllers.IsNginxIngressSupported(pulp)
 }
 
@@ -455,7 +455,7 @@ func ignoreCronjobStatus() predicate.Predicate {
 // It is used to "link" these Secrets/ConfigMaps (not "owned" by Pulp operator) with Pulp object
 func (r *RepoManagerReconciler) findPulpDependentObjects(ctx context.Context, obj client.Object) []reconcile.Request {
 
-	associatedPulp := repomanagerpulpprojectorgv1beta2.PulpList{}
+	associatedPulp := pulpv1.PulpList{}
 	opts := &client.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector("objects", obj.GetName()),
 		Namespace:     obj.GetNamespace(),
@@ -476,7 +476,7 @@ func (r *RepoManagerReconciler) findPulpDependentObjects(ctx context.Context, ob
 }
 
 // restartPulpCorePods will redeploy all pulpcore (API,content,worker) pods.
-func (r *RepoManagerReconciler) restartPulpCorePods(pulp *repomanagerpulpprojectorgv1beta2.Pulp) {
+func (r *RepoManagerReconciler) restartPulpCorePods(pulp *pulpv1.Pulp) {
 	log := r.RawLogger
 	log.Info("Reprovisioning pulpcore pods to get the new settings ...")
 	pulp.Status.LastDeploymentUpdate = time.Now().Format(time.RFC3339)
@@ -484,7 +484,7 @@ func (r *RepoManagerReconciler) restartPulpCorePods(pulp *repomanagerpulpproject
 }
 
 // runMigration deploys a k8s Job to run django migrations in case of pulpcore image change
-func (r *RepoManagerReconciler) runMigration(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) {
+func (r *RepoManagerReconciler) runMigration(ctx context.Context, pulp *pulpv1.Pulp) {
 	if !r.needsMigration(ctx, pulp) {
 		return
 	}
@@ -493,7 +493,7 @@ func (r *RepoManagerReconciler) runMigration(ctx context.Context, pulp *repomana
 
 // needsMigration verifies if the pulpcore image has changed and no migration
 // has been done yet.
-func (r *RepoManagerReconciler) needsMigration(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func (r *RepoManagerReconciler) needsMigration(ctx context.Context, pulp *pulpv1.Pulp) bool {
 
 	// if migrations are disabled in spec, we should not run it even if
 	// the image has changed
@@ -514,7 +514,7 @@ func (r *RepoManagerReconciler) needsMigration(ctx context.Context, pulp *repoma
 }
 
 // migrationDone checks if there is a migration Job with the expected image
-func (r *RepoManagerReconciler) migrationDone(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func (r *RepoManagerReconciler) migrationDone(ctx context.Context, pulp *pulpv1.Pulp) bool {
 	jobList := &batchv1.JobList{}
 	labels := jobLabels(*pulp)
 	listOpts := []client.ListOption{
@@ -528,14 +528,14 @@ func (r *RepoManagerReconciler) migrationDone(ctx context.Context, pulp *repoman
 
 // jobImageEqualsCurrent verifies if the image used in migration job is the same
 // as the one used in pulpcore-{api,content,worker} pods
-func jobImageEqualsCurrent(job batchv1.Job, pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func jobImageEqualsCurrent(job batchv1.Job, pulp *pulpv1.Pulp) bool {
 	return job.Spec.Template.Spec.Containers[0].Image == pulp.Spec.Image+":"+pulp.Spec.ImageVersion
 }
 
 // hasActiveJob will iterate over the JobList looking for any Job with the current
 // pulpcore image (meaning that a migration for the current version has already
 // been triggered and there is no need to create a new job).
-func hasActiveJob(jobList batchv1.JobList, pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func hasActiveJob(jobList batchv1.JobList, pulp *pulpv1.Pulp) bool {
 	for _, job := range jobList.Items {
 		if jobImageEqualsCurrent(job, pulp) {
 			return true
@@ -596,7 +596,7 @@ func verifyChecksum(checksum string, validateFunction func() map[string]bool) bo
 }
 
 // runSigningScriptJob deploys a k8s Job to store the metadata signing scripts
-func (r *RepoManagerReconciler) runSigningScriptJob(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) {
+func (r *RepoManagerReconciler) runSigningScriptJob(ctx context.Context, pulp *pulpv1.Pulp) {
 	if len(pulp.Spec.SigningScripts) == 0 {
 		return
 	}
@@ -620,7 +620,7 @@ func (r *RepoManagerReconciler) secretModified(ctx context.Context, secretName, 
 }
 
 // runSigningSecretTasks restart pulpcore pods if the signing secret has been modified
-func (r *RepoManagerReconciler) runSigningSecretTasks(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) *ctrl.Result {
+func (r *RepoManagerReconciler) runSigningSecretTasks(ctx context.Context, pulp *pulpv1.Pulp) *ctrl.Result {
 	secretName := pulp.Spec.SigningSecret
 	if len(secretName) == 0 {
 		return nil

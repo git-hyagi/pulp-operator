@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
 	"golang.org/x/text/cases"
@@ -22,7 +22,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *RepoManagerReconciler) pulpCacheController(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, log logr.Logger) (ctrl.Result, error) {
+func (r *RepoManagerReconciler) pulpCacheController(ctx context.Context, pulp *pulpv1.Pulp, log logr.Logger) (ctrl.Result, error) {
 
 	// conditionType is used to update .status.conditions with the current resource state
 	conditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-API-Ready"
@@ -141,7 +141,7 @@ func (r *RepoManagerReconciler) pulpCacheController(ctx context.Context, pulp *r
 }
 
 // pulp-redis-data PVC
-func redisDataPVC(m *repomanagerpulpprojectorgv1beta2.Pulp) *corev1.PersistentVolumeClaim {
+func redisDataPVC(m *pulpv1.Pulp) *corev1.PersistentVolumeClaim {
 
 	storageClass := &m.Spec.Cache.RedisStorageClass
 
@@ -173,7 +173,7 @@ func redisDataPVC(m *repomanagerpulpprojectorgv1beta2.Pulp) *corev1.PersistentVo
 }
 
 // redis-svc Service
-func redisSvc(m *repomanagerpulpprojectorgv1beta2.Pulp) *corev1.Service {
+func redisSvc(m *pulpv1.Pulp) *corev1.Service {
 	servicePortProto := corev1.Protocol("TCP")
 	targetPort := intstr.IntOrString{IntVal: 6379}
 	port := m.Spec.Cache.RedisPort
@@ -201,7 +201,7 @@ func redisSvc(m *repomanagerpulpprojectorgv1beta2.Pulp) *corev1.Service {
 }
 
 // redisDeployment returns a Redis Deployment object
-func redisDeployment(m *repomanagerpulpprojectorgv1beta2.Pulp, funcResources controllers.FunctionResources) *appsv1.Deployment {
+func redisDeployment(m *pulpv1.Pulp, funcResources controllers.FunctionResources) *appsv1.Deployment {
 
 	replicas := int32(1)
 	ls := labelsForCache(m)
@@ -407,7 +407,7 @@ func removeStorageDefinition(resources *corev1.ResourceRequirements) {
 
 // deprovisionCache removes Redis resources in case cache is not enabled anymore
 // or in case of a new definition with an external Redis instance
-func (r *RepoManagerReconciler) deprovisionCache(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, log logr.Logger) (ctrl.Result, error) {
+func (r *RepoManagerReconciler) deprovisionCache(ctx context.Context, pulp *pulpv1.Pulp, log logr.Logger) (ctrl.Result, error) {
 	// redis-svc Service
 	svcName := settings.CacheService(pulp.Name)
 	svcFound := &corev1.Service{}
@@ -435,13 +435,13 @@ func (r *RepoManagerReconciler) deprovisionCache(ctx context.Context, pulp *repo
 
 // labelsForCache returns the labels for selecting the resources
 // belonging to the given pulp CR name.
-func labelsForCache(m *repomanagerpulpprojectorgv1beta2.Pulp) map[string]string {
+func labelsForCache(m *pulpv1.Pulp) map[string]string {
 	return settings.PulpcoreLabels(*m, "cache")
 }
 
 // managedCacheDisabled returns true if
 // * there is no definition for external cache
 // * the managed cache (deployed by pulp-operator) has a different definition than the status
-func managedCacheDisabled(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func managedCacheDisabled(pulp *pulpv1.Pulp) bool {
 	return len(pulp.Spec.Cache.ExternalCacheSecret) == 0 && pulp.Spec.Cache.Enabled != pulp.Status.ManagedCacheEnabled
 }

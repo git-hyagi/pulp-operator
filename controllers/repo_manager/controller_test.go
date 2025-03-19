@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
 	routev1 "github.com/openshift/api/route/v1"
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
@@ -19,7 +19,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -821,7 +820,7 @@ exec "${PULP_CONTENT_ENTRYPOINT[@]}" \
 		},
 	}
 
-	createdPulp := &repomanagerpulpprojectorgv1beta2.Pulp{}
+	createdPulp := &pulpv1.Pulp{}
 	createdSts := &appsv1.StatefulSet{}
 	createdApiDeployment := &appsv1.Deployment{}
 	createdContentDeployment := &appsv1.Deployment{}
@@ -830,45 +829,41 @@ exec "${PULP_CONTENT_ENTRYPOINT[@]}" \
 	// instantiate a pulp CR
 	BeforeAll(func() {
 
-		pulpSettings := runtime.RawExtension{
-			Raw: []byte(`{"Api_Root": "/pulp/"}`),
-		}
-
 		postgresStorageClass := "standard"
 
 		// [TODO] Instead of using this hardcoded pulp CR we should
 		// use the samples from config/samples/ folder during each
 		// pipeline workflow execution
 		// this is the example pulp CR
-		pulp := &repomanagerpulpprojectorgv1beta2.Pulp{
+		pulp := &pulpv1.Pulp{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      PulpName,
 				Namespace: PulpNamespace,
 			},
-			Spec: repomanagerpulpprojectorgv1beta2.PulpSpec{
+			Spec: pulpv1.PulpSpec{
 				DeploymentType: OperatorType,
-				Cache: repomanagerpulpprojectorgv1beta2.Cache{
+				Cache: pulpv1.Cache{
 					Enabled:           true,
 					RedisStorageClass: "standard",
 				},
 				ImageVersion:    "latest",
 				ImageWebVersion: "latest",
-				Api: repomanagerpulpprojectorgv1beta2.Api{
+				Api: pulpv1.Api{
 					Replicas: 1,
 					EnvVars:  []corev1.EnvVar{customEnvVar},
 				},
-				Content: repomanagerpulpprojectorgv1beta2.Content{
+				Content: pulpv1.Content{
 					Replicas: 1,
 					EnvVars:  []corev1.EnvVar{customEnvVar},
 				},
-				Worker: repomanagerpulpprojectorgv1beta2.Worker{
+				Worker: pulpv1.Worker{
 					Replicas: 1,
 					EnvVars:  []corev1.EnvVar{customEnvVar},
 				},
-				Web: repomanagerpulpprojectorgv1beta2.Web{
+				Web: pulpv1.Web{
 					Replicas: 1,
 				},
-				Database: repomanagerpulpprojectorgv1beta2.Database{
+				Database: pulpv1.Database{
 					PostgresStorageClass:        &postgresStorageClass,
 					PostgresStorageRequirements: "5Gi",
 				},
@@ -876,7 +871,6 @@ exec "${PULP_CONTENT_ENTRYPOINT[@]}" \
 				FileStorageSize:       "2Gi",
 				FileStorageClass:      "standard",
 				IngressType:           "nodeport",
-				PulpSettings:          pulpSettings,
 			},
 		}
 

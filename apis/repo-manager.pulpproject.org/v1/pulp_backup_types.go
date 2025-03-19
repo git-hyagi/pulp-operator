@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +kubebuilder:skip
-package v1beta2
+package v1
 
 import (
 	corev1 "k8s.io/api/core/v1"
@@ -106,6 +105,7 @@ type PulpBackupStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:storageversion
 
 // PulpBackup is the Schema for the pulpbackups API
 type PulpBackup struct {

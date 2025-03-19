@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"strings"
 
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
 	"golang.org/x/text/cases"
@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (r *RepoManagerReconciler) createSecrets(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) (*ctrl.Result, error) {
+func (r *RepoManagerReconciler) createSecrets(ctx context.Context, pulp *pulpv1.Pulp) (*ctrl.Result, error) {
 
 	// conditionType is used to update .status.conditions with the current resource state
 	conditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-API-Ready"
@@ -525,30 +525,8 @@ func convertSettings(key string, settings interface{}) string {
 	return converted
 }
 
-// [DEPRECATED] PulppSettings should not be used anymore. Keeping it to avoid compatibility issues
-// oldCustomPulpSettings appends custom settings defined in Pulp CR into pulpSettings
-func oldCustomPulpSettings(pulp *repomanagerpulpprojectorgv1beta2.Pulp, pulpSettings *string) {
-	settings := pulp.Spec.PulpSettings.Raw
-	var settingsJson map[string]interface{}
-	json.Unmarshal(settings, &settingsJson)
-
-	var convertedSettings string
-	sortedKeys := sortKeys(settingsJson)
-	for _, k := range sortedKeys {
-		convertedSettings = convertedSettings + convertSettings(k, settingsJson[k])
-	}
-
-	*pulpSettings = *pulpSettings + convertedSettings
-}
-
 func addCustomPulpSettings(resources controllers.FunctionResources, pulpSettings *string) {
 	pulp := resources.Pulp
-
-	// [DEPRECATED] PulppSettings should not be used anymore. Keeping it to avoid compatibility issues
-	if pulp.Spec.PulpSettings.Raw != nil {
-		oldCustomPulpSettings(pulp, pulpSettings)
-		return
-	}
 
 	if pulp.Spec.CustomPulpSettings == "" {
 		return

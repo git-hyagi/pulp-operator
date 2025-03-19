@@ -14,7 +14,7 @@ spec:
     singular: pulpbackup
   scope: Namespaced
   versions:
-  - name: v1beta2
+  - name: v1
     schema:
       openAPIV3Schema:
         description: PulpBackup is the Schema for the pulpbackups API

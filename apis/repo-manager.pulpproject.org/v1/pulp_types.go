@@ -14,15 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +kubebuilder:unservedversion
-package v1beta2
+package v1
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // PulpSpec defines the desired state of Pulp
@@ -93,13 +91,6 @@ type PulpSpec struct {
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:io.kubernetes:Secret","urn:alm:descriptor:com.tectonic.ui:advanced"}
 	SigningSecret string `json:"signing_secret,omitempty"`
-
-	// [DEPRECATED] ConfigMap where the signing scripts are stored.
-	// This field is deprecated and will be removed in the future, use the
-	// signing_scripts field instead.
-	// +kubebuilder:validation:Optional
-	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:io.kubernetes:ConfigMap","urn:alm:descriptor:com.tectonic.ui:advanced"}
-	SigningScriptsConfigmap string `json:"signing_scripts_configmap,omitempty"`
 
 	// Name of the Secret where the signing scripts are stored.
 	// +kubebuilder:validation:Optional
@@ -281,14 +272,6 @@ type PulpSpec struct {
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
 	Cache Cache `json:"cache,omitempty"`
-
-	// [DEPRECATED] Definition of /etc/pulp/settings.py config file.
-	// This field is deprecated and will be removed in the future, use the
-	// custom_pulp_settings field instead.
-	// +kubebuilder:pruning:PreserveUnknownFields
-	// +kubebuilder:validation:Optional
-	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:advanced"}
-	PulpSettings runtime.RawExtension `json:"pulp_settings,omitempty"`
 
 	// Name of the ConfigMap to define Pulp configurations not available
 	// through this CR.
@@ -999,8 +982,9 @@ type PulpStatus struct {
 	StorageType string `json:"storage_type,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:storageversion
 
 // Pulp is the Schema for the pulps API
 type Pulp struct {

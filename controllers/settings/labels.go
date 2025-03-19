@@ -1,10 +1,10 @@
 package settings
 
 import (
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 )
 
-func PulpcoreLabels(pulp repomanagerpulpprojectorgv1beta2.Pulp, pulpType string) map[string]string {
+func PulpcoreLabels(pulp pulpv1.Pulp, pulpType string) map[string]string {
 	deploymentType := pulp.Spec.DeploymentType
 	return map[string]string{
 		"app.kubernetes.io/name":       deploymentType + "-" + pulpType,
@@ -17,7 +17,7 @@ func PulpcoreLabels(pulp repomanagerpulpprojectorgv1beta2.Pulp, pulpType string)
 	}
 }
 
-func CommonLabels(pulp repomanagerpulpprojectorgv1beta2.Pulp) map[string]string {
+func CommonLabels(pulp pulpv1.Pulp) map[string]string {
 	deploymentType := pulp.Spec.DeploymentType
 	return map[string]string{
 		"app.kubernetes.io/part-of":    deploymentType,

@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
 	"golang.org/x/text/cases"
@@ -47,7 +47,7 @@ type pulpResource struct {
 }
 
 // pulpStatus will cheeck the READY state of the pods before considering the component status as ready
-func (r *RepoManagerReconciler) pulpStatus(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, log logr.Logger) *ctrl.Result {
+func (r *RepoManagerReconciler) pulpStatus(ctx context.Context, pulp *pulpv1.Pulp, log logr.Logger) *ctrl.Result {
 
 	// update pulp.status.<fields>
 	setStatusFields(ctx, pulp, *r)
@@ -66,7 +66,7 @@ func isDeploymentReady(deployment *appsv1.Deployment) bool {
 }
 
 // setStatusConditions updates the pulp.Status.Conditions[] field
-func (r *RepoManagerReconciler) setStatusConditions(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, log logr.Logger) *reconcile.Result {
+func (r *RepoManagerReconciler) setStatusConditions(ctx context.Context, pulp *pulpv1.Pulp, log logr.Logger) *reconcile.Result {
 	pulpResources := []pulpResource{
 		{
 			Type:          string(settings.CONTENT),
@@ -151,7 +151,7 @@ func (r *RepoManagerReconciler) setStatusConditions(ctx context.Context, pulp *r
 }
 
 // needsIngressStatusUpdate returns false when there is no need to deploy pulp-web, so we will not need to worry about updating .status field with it
-func (r *RepoManagerReconciler) needsIngressStatusUpdate(ctx context.Context, resource pulpResource, pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func (r *RepoManagerReconciler) needsIngressStatusUpdate(ctx context.Context, resource pulpResource, pulp *pulpv1.Pulp) bool {
 	if resource.Type == string(settings.WEB) {
 		if isRoute(pulp) || r.isNginxIngress(pulp) {
 			return false
@@ -168,9 +168,9 @@ func (r *RepoManagerReconciler) needsIngressStatusUpdate(ctx context.Context, re
 }
 
 // setStatusFields updates all pulp.Status.<fields>
-func setStatusFields(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, r RepoManagerReconciler) {
+func setStatusFields(ctx context.Context, pulp *pulpv1.Pulp, r RepoManagerReconciler) {
 	conditionFunctions := []struct {
-		verifyFunc func(*repomanagerpulpprojectorgv1beta2.Pulp) bool
+		verifyFunc func(*pulpv1.Pulp) bool
 		fieldName  string
 	}{
 		{verifyFunc: deploymentTypeCondition(), fieldName: "DeploymentType"},
@@ -221,87 +221,87 @@ func setStatusFields(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2
 }
 
 // deploymentTypeCondition returns the function to verify if a new pulp.Status.DeploymentType should be set
-func deploymentTypeCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool { return len(pulp.Status.DeploymentType) == 0 }
+func deploymentTypeCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool { return len(pulp.Status.DeploymentType) == 0 }
 }
 
 // objAzureSecretCondition returns the function to verify if a new pulp.Status.ObjectStorageAzureSecret should be set
-func objAzureSecretCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func objAzureSecretCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Status.ObjectStorageAzureSecret) == 0 && len(pulp.Spec.ObjectStorageAzureSecret) > 0
 	}
 }
 
 // objS3SecretCondition returns the function to verify if a new pulp.Status.ObjectStorageS3Secret should be set
-func objS3SecretCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func objS3SecretCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Status.ObjectStorageS3Secret) == 0 && len(pulp.Spec.ObjectStorageS3Secret) > 0
 	}
 }
 
 // dbFieldsEncrSecretCondition returns the function to verify if a new pulp.Status.DBFieldsEncryptionSecret should be set
-func dbFieldsEncrSecretCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func dbFieldsEncrSecretCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Status.DBFieldsEncryptionSecret) == 0 && len(pulp.Spec.DBFieldsEncryptionSecret) > 0
 	}
 }
 
 // ingressTypeCondition returns the function to verify if a new pulp.Status.IngressType should be set
-func ingressTypeCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool { return len(pulp.Status.IngressType) == 0 }
+func ingressTypeCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool { return len(pulp.Status.IngressType) == 0 }
 }
 
 // containerTokenSecretCondition returns the function to verify if a new pulp.Status.ContainerTokenSecret should be set
-func containerTokenSecretCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func containerTokenSecretCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Status.ContainerTokenSecret) == 0 && len(pulp.Spec.ContainerTokenSecret) > 0
 	}
 }
 
 // adminPwdSecretCondition returns the function to verify if a new pulp.Status.AdminPasswordSecret should be set
-func adminPwdSecretCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func adminPwdSecretCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Status.AdminPasswordSecret) == 0 && len(pulp.Spec.AdminPasswordSecret) > 0
 	}
 }
 
 // externalCacheSecretCondition returns the function to verify if a new pulp.Status.ExternalCacheSecret should be set
-func externalCacheSecretCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func externalCacheSecretCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Status.ExternalCacheSecret) == 0 && len(pulp.Spec.Cache.ExternalCacheSecret) > 0
 	}
 }
 
 // ingressClassNameCondition returns the function to verify if a new pulp.Status.IngressClassName should be set
-func ingressClassNameCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func ingressClassNameCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Status.IngressClassName) == 0 && len(pulp.Spec.IngressClassName) > 0
 	}
 }
 
 // telemetryEnabledCondition returns the function to verify if a new pulp.Status.TelemetryEnabled should be set
-func telemetryEnabledCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func telemetryEnabledCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return pulp.Status.TelemetryEnabled != pulp.Spec.Telemetry.Enabled
 	}
 }
 
 // pulpSecretKeyCondition returns the function to verify if a new pulp.Status.PulpSecretKey should be set
-func pulpSecretKeyCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func pulpSecretKeyCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Status.PulpSecretKey) == 0 && len(pulp.Spec.PulpSecretKey) > 0
 	}
 }
 
 // allowedContentChecksumsCondition returns the function to verify if a new pulp.Status.AllowedContentChecksums should be set
-func allowedContentChecksumsCondition() func(*repomanagerpulpprojectorgv1beta2.Pulp) bool {
-	return func(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func allowedContentChecksumsCondition() func(*pulpv1.Pulp) bool {
+	return func(pulp *pulpv1.Pulp) bool {
 		return len(pulp.Spec.AllowedContentChecksums) == 0
 	}
 }
 
 // setStatus updates an specific field from pulp.Status
-func setStatus(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp, condition func(*repomanagerpulpprojectorgv1beta2.Pulp) bool, r RepoManagerReconciler, field string) {
+func setStatus(ctx context.Context, pulp *pulpv1.Pulp, condition func(*pulpv1.Pulp) bool, r RepoManagerReconciler, field string) {
 	if condition(pulp) {
 		currentSpec := reflect.ValueOf(pulp.Spec).FieldByName(field).String()
 		reflect.ValueOf(&pulp.Status).Elem().FieldByName(field).SetString(currentSpec)

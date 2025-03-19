@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"regexp"
 
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
 	"golang.org/x/text/cases"
@@ -34,7 +34,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *RepoManagerReconciler) CreateServiceAccount(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) (ctrl.Result, error) {
+func (r *RepoManagerReconciler) CreateServiceAccount(ctx context.Context, pulp *pulpv1.Pulp) (ctrl.Result, error) {
 	log := r.RawLogger
 	conditionType := getApiConditionType(pulp)
 
@@ -81,7 +81,7 @@ func (r *RepoManagerReconciler) CreateServiceAccount(ctx context.Context, pulp *
 	return r.CreateRole(ctx, pulp)
 }
 
-func (r *RepoManagerReconciler) CreateRole(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) (ctrl.Result, error) {
+func (r *RepoManagerReconciler) CreateRole(ctx context.Context, pulp *pulpv1.Pulp) (ctrl.Result, error) {
 	log := r.RawLogger
 	conditionType := getApiConditionType(pulp)
 	role := &rbacv1.Role{}
@@ -107,7 +107,7 @@ func (r *RepoManagerReconciler) CreateRole(ctx context.Context, pulp *repomanage
 	return r.CreateRoleBinding(ctx, pulp)
 }
 
-func (r *RepoManagerReconciler) CreateRoleBinding(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) (ctrl.Result, error) {
+func (r *RepoManagerReconciler) CreateRoleBinding(ctx context.Context, pulp *pulpv1.Pulp) (ctrl.Result, error) {
 	log := r.RawLogger
 	conditionType := getApiConditionType(pulp)
 	rolebinding := &rbacv1.RoleBinding{}
@@ -133,7 +133,7 @@ func (r *RepoManagerReconciler) CreateRoleBinding(ctx context.Context, pulp *rep
 	return ctrl.Result{}, nil
 }
 
-func (r *RepoManagerReconciler) pulpSA(m *repomanagerpulpprojectorgv1beta2.Pulp) *corev1.ServiceAccount {
+func (r *RepoManagerReconciler) pulpSA(m *pulpv1.Pulp) *corev1.ServiceAccount {
 	var imagePullSecrets []corev1.LocalObjectReference
 
 	for _, pullSecret := range m.Spec.ImagePullSecrets {
@@ -179,7 +179,7 @@ func (r *RepoManagerReconciler) getInternalRegistrySecret(ctx context.Context, s
 	return ""
 }
 
-func (r *RepoManagerReconciler) pulpRole(m *repomanagerpulpprojectorgv1beta2.Pulp) *rbacv1.Role {
+func (r *RepoManagerReconciler) pulpRole(m *pulpv1.Pulp) *rbacv1.Role {
 	return &rbacv1.Role{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      m.Name,
@@ -209,7 +209,7 @@ func (r *RepoManagerReconciler) pulpRole(m *repomanagerpulpprojectorgv1beta2.Pul
 	}
 }
 
-func (r *RepoManagerReconciler) pulpRoleBinding(m *repomanagerpulpprojectorgv1beta2.Pulp) *rbacv1.RoleBinding {
+func (r *RepoManagerReconciler) pulpRoleBinding(m *pulpv1.Pulp) *rbacv1.RoleBinding {
 	return &rbacv1.RoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      m.Name,
@@ -234,7 +234,7 @@ func (r *RepoManagerReconciler) pulpRoleBinding(m *repomanagerpulpprojectorgv1be
 }
 
 // getConditionType returns a string with the .status.conditions.type from API resource
-func getApiConditionType(m *repomanagerpulpprojectorgv1beta2.Pulp) string {
+func getApiConditionType(m *pulpv1.Pulp) string {
 	return cases.Title(language.English, cases.Compact).String(m.Spec.DeploymentType) + "-API-Ready"
 }
 

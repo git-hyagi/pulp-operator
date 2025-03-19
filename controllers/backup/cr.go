@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (r *RepoManagerBackupReconciler) backupCR(ctx context.Context, pulpBackup *repomanagerpulpprojectorgv1beta2.PulpBackup, backupDir string, pod *corev1.Pod) error {
+func (r *RepoManagerBackupReconciler) backupCR(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
 	deploymentName := getDeploymentName(ctx, pulpBackup)
 	deploymentType := getDeploymentType(ctx, pulpBackup)
@@ -18,7 +18,7 @@ func (r *RepoManagerBackupReconciler) backupCR(ctx context.Context, pulpBackup *
 	// we are considering that pulp CR instance is running in the same namespace as pulpbackup and
 	// that there is only a single instance of pulp CR available
 	// we could also let users pass the name of pulp instance
-	pulp := &repomanagerpulpprojectorgv1beta2.Pulp{}
+	pulp := &pulpv1.Pulp{}
 	err := r.Get(ctx, types.NamespacedName{Name: deploymentName, Namespace: pulpBackup.Namespace}, pulp)
 	if err != nil {
 		log.Error(err, "Failed to get Pulp")

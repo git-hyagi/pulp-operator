@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"hash/fnv"
@@ -31,7 +30,7 @@ import (
 
 	"github.com/go-logr/logr"
 	routev1 "github.com/openshift/api/route/v1"
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers/settings"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -72,11 +71,9 @@ const (
 # This file is managed by Pulp operator.
 # DO NOT EDIT IT.
 #
-# To modify custom fields, use the pulp_settings from Pulp CR, for example:
+# To modify custom fields, use the custom_pulp_settings from Pulp CR, for example:
 # spec:
-#   pulp_settings:
-#     allowed_export_paths:
-#     - /tmp
+#   custom_pulp_settings: <configmap name>
 
 `
 	DefaultOCPIngressClass = "openshift-default"
@@ -87,7 +84,7 @@ const (
 type FunctionResources struct {
 	context.Context
 	client.Client
-	*repomanagerpulpprojectorgv1beta2.Pulp
+	*pulpv1.Pulp
 	Scheme *runtime.Scheme
 	logr.Logger
 }
@@ -126,7 +123,7 @@ func IsOpenShift() (bool, error) {
 // MultiStorageConfigured returns true if Pulp CR is configured with more than one "storage type"
 // for example, if ObjectStorageAzureSecret and FileStorageClass are defined we can't determine
 // which one the operator should use.
-func MultiStorageConfigured(pulp *repomanagerpulpprojectorgv1beta2.Pulp, resource string) (bool, []string) {
+func MultiStorageConfigured(pulp *pulpv1.Pulp, resource string) (bool, []string) {
 	var names []string
 
 	switch resource {
@@ -243,7 +240,7 @@ func ContainerExec[T any](client T, pod *corev1.Pod, command []string, container
 }
 
 // IsNginxIngressSupported returns true if the operator was instructed that this is a nginx ingress controller
-func IsNginxIngressSupported(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func IsNginxIngressSupported(pulp *pulpv1.Pulp) bool {
 	return pulp.Spec.IsNginxIngress
 }
 
@@ -284,21 +281,21 @@ func CustomZapLogger() *zap.Logger {
 
 // CheckImageVersionModified verifies if the container image tag defined in
 // Pulp CR matches the one in the Deployment
-func ImageChanged(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func ImageChanged(pulp *pulpv1.Pulp) bool {
 	definedImage := pulp.Spec.Image + ":" + pulp.Spec.ImageVersion
 	currentImage := pulp.Status.Image
 	return currentImage != definedImage
 }
 
 // StorageTypeChanged verifies if the storage type has been modified
-func StorageTypeChanged(pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func StorageTypeChanged(pulp *pulpv1.Pulp) bool {
 	currentStorageType := pulp.Status.StorageType
 	definedStorageType := GetStorageType(*pulp)
 	return currentStorageType != definedStorageType[0]
 }
 
 // WaitAPIPods waits until all API pods are in a READY state
-func WaitAPIPods[T any](resource T, pulp *repomanagerpulpprojectorgv1beta2.Pulp, deployment *appsv1.Deployment, timeout time.Duration) {
+func WaitAPIPods[T any](resource T, pulp *pulpv1.Pulp, deployment *appsv1.Deployment, timeout time.Duration) {
 
 	// we need to add a litte "stand by" to give time for the operator get the updated status from database/cluster
 	time.Sleep(time.Millisecond * 500)
@@ -315,15 +312,7 @@ func WaitAPIPods[T any](resource T, pulp *repomanagerpulpprojectorgv1beta2.Pulp,
 }
 
 // getPulpSetting returns the value of a Pulp setting field
-func getPulpSetting(r client.Client, pulp *repomanagerpulpprojectorgv1beta2.Pulp, key string) string {
-	// [DEPRECATED] PulppSettings should not be used anymore. Keeping it to avoid compatibility issues
-	if settings := pulp.Spec.PulpSettings.Raw; settings != nil {
-		var settingsJson map[string]interface{}
-		json.Unmarshal(settings, &settingsJson)
-		if setting := settingsJson[key]; setting != nil && setting.(string) != "" {
-			return setting.(string)
-		}
-	}
+func getPulpSetting(r client.Client, pulp *pulpv1.Pulp, key string) string {
 
 	if pulp.Spec.CustomPulpSettings != "" {
 		settingsCM := &corev1.ConfigMap{}
@@ -349,7 +338,7 @@ func getCMData(cm *corev1.ConfigMap, key string) *string {
 }
 
 // domainEnabled returns the definition of DOMAIN_ENABLED in settings.py
-func domainEnabled(r client.Client, pulp *repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func domainEnabled(r client.Client, pulp *pulpv1.Pulp) bool {
 	if domainEnabled := getPulpSetting(r, pulp, "domain_enabled"); domainEnabled != "" {
 		enabled, _ := strconv.ParseBool(domainEnabled)
 		return enabled
@@ -358,7 +347,7 @@ func domainEnabled(r client.Client, pulp *repomanagerpulpprojectorgv1beta2.Pulp)
 }
 
 // GetAPIRoot returns the definition of API_ROOT in settings.py or /pulp/
-func GetAPIRoot(r client.Client, pulp *repomanagerpulpprojectorgv1beta2.Pulp) string {
+func GetAPIRoot(r client.Client, pulp *pulpv1.Pulp) string {
 	if apiRoot := getPulpSetting(r, pulp, "api_root"); apiRoot != "" {
 		return strings.Replace(apiRoot, "\"", "", -1)
 	}
@@ -368,7 +357,7 @@ func GetAPIRoot(r client.Client, pulp *repomanagerpulpprojectorgv1beta2.Pulp) st
 // GetContentPathPrefix returns the definition of CONTENT_PATH_PREFIX in settings.py or
 // * /pulp/content/default/ if domain is enabled
 // * /pulp/content/ otherwise
-func GetContentPathPrefix(r client.Client, pulp *repomanagerpulpprojectorgv1beta2.Pulp) string {
+func GetContentPathPrefix(r client.Client, pulp *pulpv1.Pulp) string {
 	if contentPath := getPulpSetting(r, pulp, "content_path_prefix"); contentPath != "" {
 		return strings.Replace(contentPath, "\"", "", -1)
 	}
@@ -428,7 +417,7 @@ func RetrieveSecretData(ctx context.Context, secretName, secretNamespace string,
 
 // UpdateStatus will set the new condition value for a .status.conditions[]
 // it will also set Pulp-Operator-Finished-Execution to false
-func UpdateStatus(ctx context.Context, r client.Client, pulp *repomanagerpulpprojectorgv1beta2.Pulp, conditionStatus metav1.ConditionStatus, conditionType, conditionReason, conditionMessage string) {
+func UpdateStatus(ctx context.Context, r client.Client, pulp *pulpv1.Pulp, conditionStatus metav1.ConditionStatus, conditionType, conditionReason, conditionMessage string) {
 
 	// if we are updating a status it means that operator didn't finish its execution
 	// set Pulp-Operator-Finished-Execution to false
@@ -759,7 +748,7 @@ func ReconcileMetadata(funcResources FunctionResources, expectedState, currentSt
 }
 
 // UpdatCRField patches fieldName in Pulp CR with fieldValue
-func UpdateCRField(ctx context.Context, r client.Client, pulp *repomanagerpulpprojectorgv1beta2.Pulp, fieldName, fieldValue string) error {
+func UpdateCRField(ctx context.Context, r client.Client, pulp *pulpv1.Pulp, fieldName, fieldValue string) error {
 	field := reflect.Indirect(reflect.ValueOf(&pulp.Spec)).FieldByName(fieldName)
 
 	// we will only set the field (with default values) if there is nothing defined yet
@@ -860,7 +849,7 @@ func isPulpcoreEnvVar(envVar string) bool {
 }
 
 // setCustomEnvVars returns the list of custom environment variables defined in Pulp CR
-func SetCustomEnvVars(pulp repomanagerpulpprojectorgv1beta2.Pulp, component string) []corev1.EnvVar {
+func SetCustomEnvVars(pulp pulpv1.Pulp, component string) []corev1.EnvVar {
 	userDefinedVars := []corev1.EnvVar{}
 
 	switch component {
@@ -882,12 +871,12 @@ func SetCustomEnvVars(pulp repomanagerpulpprojectorgv1beta2.Pulp, component stri
 }
 
 // setPulpcoreCustomEnvVars returns the list of custom environment variables defined in Pulp CR
-func SetPulpcoreCustomEnvVars(pulp repomanagerpulpprojectorgv1beta2.Pulp, pulpcoreType settings.PulpcoreType) []corev1.EnvVar {
+func SetPulpcoreCustomEnvVars(pulp pulpv1.Pulp, pulpcoreType settings.PulpcoreType) []corev1.EnvVar {
 	return SetCustomEnvVars(pulp, string(pulpcoreType))
 }
 
 // GetStorageType retrieves the storage type defined in pulp CR
-func GetStorageType(pulp repomanagerpulpprojectorgv1beta2.Pulp) []string {
+func GetStorageType(pulp pulpv1.Pulp) []string {
 	_, storageType := MultiStorageConfigured(&pulp, "Pulp")
 	return storageType
 }
@@ -931,6 +920,6 @@ func SetDefaultSecurityContext() *corev1.SecurityContext {
 	}
 }
 
-func Ipv6Disabled(pulp repomanagerpulpprojectorgv1beta2.Pulp) bool {
+func Ipv6Disabled(pulp pulpv1.Pulp) bool {
 	return pulp.Spec.IPv6Disabled != nil && *pulp.Spec.IPv6Disabled
 }

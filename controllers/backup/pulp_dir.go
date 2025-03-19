@@ -3,20 +3,20 @@ package repo_manager_backup
 import (
 	"context"
 
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
 // backupPulpDir copies the content of /var/lib/pulp into the backup PVC
-func (r *RepoManagerBackupReconciler) backupPulpDir(ctx context.Context, pulpBackup *repomanagerpulpprojectorgv1beta2.PulpBackup, backupDir string, pod *corev1.Pod) error {
+func (r *RepoManagerBackupReconciler) backupPulpDir(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
 	deploymentName := getDeploymentName(ctx, pulpBackup)
 	deploymentType := getDeploymentType(ctx, pulpBackup)
 	backupPod := pulpBackup.Name + "-backup-manager"
 
-	pulp := &repomanagerpulpprojectorgv1beta2.Pulp{}
+	pulp := &pulpv1.Pulp{}
 	if err := r.Get(ctx, types.NamespacedName{Name: deploymentName, Namespace: pulpBackup.Namespace}, pulp); err != nil {
 		log.Error(err, "Failed to get Pulp")
 		return err
