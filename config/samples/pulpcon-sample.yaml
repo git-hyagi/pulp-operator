@@ -12,7 +12,7 @@ data:
   POSTGRES_SSLMODE: cHJlZmVy
 
 ---
-apiVersion: repo-manager.pulpproject.org/v1beta2
+apiVersion: repo-manager.pulpproject.org/v1
 kind: Pulp
 metadata:
   name: pulp
