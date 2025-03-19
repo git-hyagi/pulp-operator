@@ -59,6 +59,8 @@ type PulpRestoreSpec struct {
 	KeepBackupReplicasCount bool `json:"keep_replicas"`
 }
 
+//+kubebuilder:unservedversion
+
 // PulpRestoreStatus defines the observed state of PulpRestore
 type PulpRestoreStatus struct {
 	//+operator-sdk:csv:customresourcedefinitions:type=status,xDescriptors={"urn:alm:descriptor:io.kubernetes.conditions"}
