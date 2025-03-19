@@ -3,12 +3,12 @@ package repo_manager_restore
 import (
 	"context"
 
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 )
 
 // backupPulpDir copies the content of /var/lib/pulp into the backup PVC
-func (r *RepoManagerRestoreReconciler) restorePulpDir(ctx context.Context, pulpRestore *repomanagerpulpprojectorgv1beta2.PulpRestore, backupPVCName, backupDir string) error {
+func (r *RepoManagerRestoreReconciler) restorePulpDir(ctx context.Context, pulpRestore *pulpv1.PulpRestore, backupPVCName, backupDir string) error {
 
 	// if file-storage PVC is not provisioned it means that pulp is deployed with object storage
 	// in this case, we should just return without action
@@ -34,7 +34,7 @@ func (r *RepoManagerRestoreReconciler) restorePulpDir(ctx context.Context, pulpR
 		return err
 	}
 
-	log.Info(pulpRestore.Spec.DeploymentType + "'s directory backup finished!")
+	log.Info("Pulp's directory backup finished!")
 
 	return nil
 }

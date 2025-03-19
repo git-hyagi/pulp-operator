@@ -20,15 +20,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
-	repomanagerpulpprojectorgv1beta2 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1beta2"
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -36,10 +33,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (r *RepoManagerReconciler) createSecrets(ctx context.Context, pulp *repomanagerpulpprojectorgv1beta2.Pulp) (*ctrl.Result, error) {
+func (r *RepoManagerReconciler) createSecrets(ctx context.Context, pulp *pulpv1.Pulp) (*ctrl.Result, error) {
 
 	// conditionType is used to update .status.conditions with the current resource state
-	conditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-API-Ready"
+	conditionType := "Pulp-API-Ready"
 
 	// if .spec.admin_password_secret is not defined, operator will default to pulp-admin-password
 	adminSecretName := settings.DefaultAdminPassword(pulp.Name)
@@ -480,75 +477,8 @@ func allowedContentChecksumsSettings(resources controllers.FunctionResources, pu
 	*pulpSettings = *pulpSettings + fmt.Sprintln("ALLOWED_CONTENT_CHECKSUMS = ", string(settings))
 }
 
-func convertSettings(key string, settings interface{}) string {
-	var converted string
-	switch s := settings.(type) {
-
-	case map[string]interface{}:
-		var settingsJson map[string]interface{}
-		settingsMarshalled, _ := json.Marshal(s)
-		json.Unmarshal(settingsMarshalled, &settingsJson)
-
-		sortedKeys := sortKeys(settingsJson)
-		converted = converted + fmt.Sprintf("%v = {\n", strings.ToUpper(key))
-		for _, k := range sortedKeys {
-			rc, _ := regexp.Compile(`(?s)(.*) = (.*)\n`)
-			rp := rc.ReplaceAllString(convertSettings(k, settingsJson[k]), `'$1': $2`)
-			converted = converted + fmt.Sprintf("  %v,\n", rp)
-		}
-		converted = fmt.Sprintf("%v}\n", converted)
-	case []interface{}:
-		converted = fmt.Sprintf("%v = [\n", strings.ToUpper(key))
-		for i := range s {
-			rc, _ := regexp.Compile(`(?s)(.*) = (.*)\n`)
-			rp := rc.ReplaceAllString(convertSettings(key, s[i]), `$2`)
-			converted = converted + fmt.Sprintf("  %v,\n", rp)
-		}
-		converted = fmt.Sprintf("%v]\n", converted)
-	case bool:
-		// Pulp expects True or False, but golang boolean values are true or false
-		// so we are converting to string and changing to capital T or F
-		convertToString := cases.Title(language.English, cases.Compact).String(strconv.FormatBool(s))
-		converted = converted + fmt.Sprintf("%v = %v\n", strings.ToUpper(key), convertToString)
-	case float32, float64:
-		converted = converted + fmt.Sprintf("%v = %v\n", strings.ToUpper(key), s)
-	default:
-		// if it is a tuple, we should not parse it as a string (do not add the quotes)
-		r, _ := regexp.Compile(`\(.*\)`)
-		if r.MatchString(s.(string)) {
-			converted = converted + fmt.Sprintf("%v = %v\n", strings.ToUpper(key), s)
-		} else {
-			converted = converted + fmt.Sprintf("%v = \"%v\"\n", strings.ToUpper(key), s)
-		}
-	}
-
-	return converted
-}
-
-// [DEPRECATED] PulppSettings should not be used anymore. Keeping it to avoid compatibility issues
-// oldCustomPulpSettings appends custom settings defined in Pulp CR into pulpSettings
-func oldCustomPulpSettings(pulp *repomanagerpulpprojectorgv1beta2.Pulp, pulpSettings *string) {
-	settings := pulp.Spec.PulpSettings.Raw
-	var settingsJson map[string]interface{}
-	json.Unmarshal(settings, &settingsJson)
-
-	var convertedSettings string
-	sortedKeys := sortKeys(settingsJson)
-	for _, k := range sortedKeys {
-		convertedSettings = convertedSettings + convertSettings(k, settingsJson[k])
-	}
-
-	*pulpSettings = *pulpSettings + convertedSettings
-}
-
 func addCustomPulpSettings(resources controllers.FunctionResources, pulpSettings *string) {
 	pulp := resources.Pulp
-
-	// [DEPRECATED] PulppSettings should not be used anymore. Keeping it to avoid compatibility issues
-	if pulp.Spec.PulpSettings.Raw != nil {
-		oldCustomPulpSettings(pulp, pulpSettings)
-		return
-	}
 
 	if pulp.Spec.CustomPulpSettings == "" {
 		return
