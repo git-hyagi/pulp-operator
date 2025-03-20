@@ -102,6 +102,13 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		return ctrl.Result{}, err
 	}
 
+	r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Running configmap backup ...", "BackupConfigMap")
+	err = r.backupConfigMap(ctx, pulpBackup, backupDir, pod)
+	if err != nil {
+		r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Failed to backup configmaps!", "FailedBackupConfigMaps")
+		return ctrl.Result{}, err
+	}
+
 	r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Running database backup ...", "BackupDB")
 	err = r.backupDatabase(ctx, pulpBackup, backupDir, pod)
 	if err != nil {
@@ -120,13 +127,6 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 	err = r.backupSecret(ctx, pulpBackup, backupDir, pod)
 	if err != nil {
 		r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Failed to backup secrets!", "FailedBackupSecrets")
-		return ctrl.Result{}, err
-	}
-
-	r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Running configmap backup ...", "BackupConfigMap")
-	err = r.backupConfigMap(ctx, pulpBackup, backupDir, pod)
-	if err != nil {
-		r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Failed to backup configmaps!", "FailedBackupConfigMaps")
 		return ctrl.Result{}, err
 	}
 

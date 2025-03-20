@@ -50,7 +50,10 @@ func (r *RepoManagerRestoreReconciler) restoreConfigMapFromYaml(ctx context.Cont
 	}
 
 	decode := scheme.Codecs.UniversalDeserializer().Decode
-	obj, _, _ := decode([]byte(cmdOutput), nil, nil)
+	obj, _, err := decode([]byte(cmdOutput), nil, nil)
+	if err != nil {
+		log.Error(err, "Failed to decode ConfigMap!")
+	}
 	cm := obj.(*corev1.ConfigMap)
 
 	// "removing" fields from backup to avoid errors

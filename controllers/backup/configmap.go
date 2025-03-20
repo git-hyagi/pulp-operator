@@ -3,6 +3,7 @@ package repo_manager_backup
 import (
 	"bytes"
 	"context"
+	"fmt"
 
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
@@ -76,7 +77,7 @@ func (r *RepoManagerBackupReconciler) createConfigMapBackupFile(ctx context.Cont
 	ymlPrinter.PrintObj(configMap, configMapYaml)
 
 	execCmd := []string{
-		"bash", "-c", "echo '" + configMapYaml.String() + "' > " + configMapType.backupDir + "/" + configMapType.backupFile,
+		"bash", "-c", fmt.Sprintf("cat<<EOF> %s/%s \n%sEOF", configMapType.backupDir, configMapType.backupFile, configMapYaml.String()),
 	}
 	_, err = controllers.ContainerExec(r, configMapType.pod, execCmd, configMapType.pulpBackup.Name+"-backup-manager", configMapType.pod.Namespace)
 	if err != nil {
