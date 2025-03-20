@@ -147,6 +147,11 @@ func (r *RepoManagerRestoreReconciler) Reconcile(ctx context.Context, req ctrl.R
 		return ctrl.Result{}, err
 	}
 
+	// Restoring the configmaps
+	if err := r.restoreConfigMap(ctx, pulpRestore, backupDir, pod); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	// Restoring the secrets
 	if err := r.restoreSecret(ctx, pulpRestore, backupDir, pod); err != nil {
 		// requeue request when there is an error with a secret restore

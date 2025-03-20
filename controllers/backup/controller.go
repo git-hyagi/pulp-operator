@@ -123,6 +123,13 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		return ctrl.Result{}, err
 	}
 
+	r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Running configmap backup ...", "BackupConfigMap")
+	err = r.backupConfigMap(ctx, pulpBackup, backupDir, pod)
+	if err != nil {
+		r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Failed to backup configmaps!", "FailedBackupConfigMaps")
+		return ctrl.Result{}, err
+	}
+
 	r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Running "+deploymentType+" dir backup ...", "BackupDir")
 	err = r.backupPulpDir(ctx, pulpBackup, backupDir, pod)
 	if err != nil {
