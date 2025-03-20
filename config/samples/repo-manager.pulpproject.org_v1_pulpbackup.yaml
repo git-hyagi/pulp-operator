@@ -4,8 +4,8 @@ kind: PulpBackup
 metadata:
   name: pulpbackup-sample
 spec:
-  deployment_name: galaxy-example
-  deployment_type: galaxy
+  deployment_name: test-pulp
+  deployment_type: pulp
   backup_storage_class: standard
   admin_password_secret: example-pulp-admin-password
-  postgres_configuration_secret: galaxy-example-postgres-configuration
+  postgres_configuration_secret: test-pulp-postgres-configuration

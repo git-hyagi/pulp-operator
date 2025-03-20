@@ -363,6 +363,7 @@ jobs:
           - COMPONENT_TYPE: telemetry
           - COMPONENT_TYPE: ldap
           - COMPONENT_TYPE: external-db
+          - COMPONENT_TYPE: minio
     steps:
       - uses: actions/checkout@v4
         with:
@@ -448,6 +449,12 @@ jobs:
             kubectl create ns db
             kubectl apply -f config/samples/external_db.yaml
             kubectl apply -f config/samples/simple-external-db.yaml
+          elif [[ "$COMPONENT_TYPE" == "s3" ]]; then
+            echo "CI_TEST_STORAGE=s3" >> $GITHUB_ENV
+            kubectl config set-context --current --namespace=pulp-operator-system
+            kubectl apply -f .ci/assets/kubernetes/pulp-admin-password.secret.yaml
+            kubectl apply -f .ci/assets/kubernetes/pulp-object-storage.aws.secret.yaml
+            kubectl apply -f config/samples/simple.s3.ci.yaml
           else
             kubectl apply -f config/samples/simple.yaml
           fi
@@ -470,6 +477,9 @@ jobs:
         shell: bash
         env:
           PY_COLORS: '1'
+      - name: Backup & Restore
+        run: .ci/scripts/backup_and_restore.sh -m
+        shell: bash
       - name: Logs
         if: always()
         run: .github/workflows/scripts/show_logs.sh
