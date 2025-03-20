@@ -18,22 +18,29 @@ kind: Pulp
 metadata:
   name: example-pulp
 spec:
-  custom_pulp_settings: settings
-  ingress_type: nodeport
+  telemetry:
+    enabled: true
+
   api:
     replicas: 1
-  cache:
-    enabled: true
   content:
     replicas: 1
   worker:
     replicas: 1
   web:
     replicas: 1
-
   database:
     postgres_storage_class: standard
 
   file_storage_access_mode: "ReadWriteOnce"
   file_storage_size: "2Gi"
   file_storage_storage_class: standard
+
+  ingress_type: nodeport
+  nodeport_port: 30000
+
+  custom_pulp_settings: settings
+
+  # workaround for a permission bug in nginx image
+  image_web_version: 3.63.4
+  inhibit_version_constraint: true

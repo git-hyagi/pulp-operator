@@ -15,11 +15,6 @@ kind: Pulp
 metadata:
   name: example-pulp
 spec:
-  deployment_type: pulp
-  image_version: stable
-  image_web_version: 3.63.4
-  inhibit_version_constraint: true
-
   custom_pulp_settings: settings
 
   api:
@@ -28,24 +23,12 @@ spec:
     replicas: 1
   worker:
     replicas: 1
-  migration_job:
-    container:
-      resource_requirements:
-        requests:
-          cpu: 1
-        limits:
-          cpu: 1
   database:
     postgres_storage_class: standard
 
   file_storage_access_mode: "ReadWriteOnce"
   file_storage_size: "2Gi"
   file_storage_storage_class: standard
-
-  # Redis configs
-  cache:
-    enabled: true
-    redis_storage_class: standard
 
   ingress_type: ingress
   ingress_host: ingress.local

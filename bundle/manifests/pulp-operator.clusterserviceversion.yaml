@@ -8,7 +8,7 @@ metadata:
           "apiVersion": "repo-manager.pulpproject.org/v1",
           "kind": "Pulp",
           "metadata": {
-            "name": "example"
+            "name": "example-pulp"
           },
           "spec": {
             "api": {
@@ -18,18 +18,9 @@ metadata:
               "enabled": true
             },
             "content": {
-              "replicas": 2,
-              "resource_requirements": {
-                "limits": {
-                  "cpu": "800m",
-                  "memory": "1Gi"
-                },
-                "requests": {
-                  "cpu": "150m",
-                  "memory": "256Mi"
-                }
-              }
+              "replicas": 1
             },
+            "custom_pulp_settings": "settings",
             "database": {
               "postgres_storage_class": "standard"
             },
@@ -37,18 +28,11 @@ metadata:
             "file_storage_size": "2Gi",
             "file_storage_storage_class": "standard",
             "ingress_type": "nodeport",
+            "web": {
+              "replicas": 1
+            },
             "worker": {
-              "replicas": 2,
-              "resource_requirements": {
-                "limits": {
-                  "cpu": "800m",
-                  "memory": "1Gi"
-                },
-                "requests": {
-                  "cpu": "150m",
-                  "memory": "256Mi"
-                }
-              }
+              "replicas": 1
             }
           }
         },
@@ -61,9 +45,9 @@ metadata:
           "spec": {
             "admin_password_secret": "example-pulp-admin-password",
             "backup_storage_class": "standard",
-            "deployment_name": "galaxy-example",
-            "deployment_type": "galaxy",
-            "postgres_configuration_secret": "galaxy-example-postgres-configuration"
+            "deployment_name": "example-pulp",
+            "deployment_type": "pulp",
+            "postgres_configuration_secret": "example-pulp-postgres-configuration"
           }
         },
         {
@@ -74,14 +58,14 @@ metadata:
           },
           "spec": {
             "backup_name": "pulpbackup-sample",
-            "deployment_name": "galaxy-example"
+            "deployment_name": "example-pulp"
           }
         }
       ]
     capabilities: Full Lifecycle
     categories: Integration & Delivery
     containerImage: quay.io/pulp/pulp-operator:devel
-    createdAt: "2025-03-19T23:08:29Z"
+    createdAt: "2025-03-20T22:59:43Z"
     description: Pulp is a platform for managing repositories of software packages
       and making them available to a large number of consumers.
     operators.operatorframework.io/builder: operator-sdk-v1.29.0

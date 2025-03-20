@@ -1,5 +1,18 @@
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: pulp-ldap-secret
+stringData:
+  auth_ldap_server_uri: "ldap://ldap.pulp-operator-system.svc"
+  auth_ldap_bind_dn: "cn=admin,dc=example,dc=org"
+  auth_ldap_bind_password: "admin"
+  auth_ldap_group_search: LDAPSearch("ou=groups,dc=example,dc=org",ldap.SCOPE_SUBTREE,"(objectClass=posixGroup)")
+  auth_ldap_user_search: LDAPSearch("ou=users,dc=example,dc=org", ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
+  auth_ldap_group_type: PosixGroupType(name_attr='cn')
+
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: settings
@@ -18,11 +31,10 @@ kind: Pulp
 metadata:
   name: example-pulp
 spec:
-  telemetry:
-    enabled: true
+  image: localhost/pulp-minimal
   image_version: stable
-  image_web_version: 3.63.4
-  inhibit_version_constraint: true
+  ldap:
+    config: pulp-ldap-secret
   api:
     replicas: 1
   content:
@@ -31,19 +43,18 @@ spec:
     replicas: 1
   web:
     replicas: 1
-  migration_job:
-    container:
-      resource_requirements:
-        requests:
-          cpu: 1
-        limits:
-          cpu: 1
-  database:
-    postgres_storage_class: standard
-  file_storage_access_mode: "ReadWriteOnce"
-  file_storage_size: "2Gi"
-  file_storage_storage_class: standard
   ingress_type: nodeport
   nodeport_port: 30000
 
+  database:
+    postgres_storage_class: standard
+
+  file_storage_access_mode: "ReadWriteOnce"
+  file_storage_size: "2Gi"
+  file_storage_storage_class: standard
+
   custom_pulp_settings: settings
+
+  # workaround for a permission bug in nginx image
+  image_web_version: 3.63.4
+  inhibit_version_constraint: true

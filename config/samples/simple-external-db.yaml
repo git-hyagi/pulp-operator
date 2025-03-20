@@ -34,9 +34,6 @@ spec:
   database:
     external_db_secret: external-database
 
-  image_version: stable
-  image_web_version: 3.63.4
-  inhibit_version_constraint: true
   api:
     replicas: 1
   content:
@@ -54,3 +51,7 @@ spec:
   file_storage_storage_class: standard
 
   custom_pulp_settings: settings
+
+  # workaround for a permission bug in nginx image
+  image_web_version: 3.63.4
+  inhibit_version_constraint: true

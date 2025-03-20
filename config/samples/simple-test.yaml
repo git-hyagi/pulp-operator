@@ -18,12 +18,6 @@ kind: Pulp
 metadata:
   name: test-pulp
 spec:
-  telemetry:
-    enabled: true
-  deployment_type: pulp
-  image_version: stable
-  image_web_version: 3.63.4
-  inhibit_version_constraint: true
   api:
     replicas: 1
   content:
@@ -32,13 +26,6 @@ spec:
     replicas: 1
   web:
     replicas: 1
-  migration_job:
-    container:
-      resource_requirements:
-        requests:
-          cpu: "250m"
-        limits:
-          cpu: "250m"
 
   database:
     postgres_storage_class: standard
@@ -47,12 +34,11 @@ spec:
   file_storage_size: "2Gi"
   file_storage_storage_class: standard
 
-  # Redis configs
-  cache:
-    enabled: true
-    redis_storage_class: standard
-
   ingress_type: nodeport
   nodeport_port: 30001
 
   custom_pulp_settings: settings
+
+  # workaround for a permission bug in nginx image
+  image_web_version: 3.63.4
+  inhibit_version_constraint: true

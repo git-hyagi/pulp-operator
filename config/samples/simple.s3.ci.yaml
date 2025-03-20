@@ -1,5 +1,13 @@
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: 'example-pulp-admin-password'
+stringData:
+  password: 'password'
+
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: settings
@@ -17,12 +25,8 @@ data:
 apiVersion: repo-manager.pulpproject.org/v1
 kind: Pulp
 metadata:
-  name: test-pulp
+  name: example-pulp
 spec:
-  image: quay.io/pulp/pulp-minimal
-  image_version: stable
-  image_web: quay.io/pulp/pulp-web
-  image_web_version: stable
   admin_password_secret: "example-pulp-admin-password"
   ingress_type: nodeport
   nodeport_port: 30000
@@ -34,31 +38,13 @@ spec:
     replicas: 1
   content:
     replicas: 1
-    resource_requirements:
-      requests:
-        cpu: 150m
-        memory: 256Mi
-      limits:
-        cpu: 800m
-        memory: 1Gi
   worker:
     replicas: 1
-    resource_requirements:
-      requests:
-        cpu: 150m
-        memory: 256Mi
-      limits:
-        cpu: 800m
-        memory: 1Gi
   web:
     replicas: 1
-    resource_requirements:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 800m
-        memory: 1Gi
-
   database:
     postgres_storage_class: standard
+
+  # workaround for a permission bug in nginx image
+  image_web_version: 3.63.4
+  inhibit_version_constraint: true
