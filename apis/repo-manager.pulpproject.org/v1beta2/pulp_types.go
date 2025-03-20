@@ -961,8 +961,6 @@ type LDAP struct {
 	CA string `json:"ca,omitempty"`
 }
 
-//+kubebuilder:unservedversion
-
 // PulpStatus defines the observed state of Pulp
 type PulpStatus struct {
 	//+operator-sdk:csv:customresourcedefinitions:type=status,xDescriptors={"urn:alm:descriptor:io.kubernetes.conditions"}

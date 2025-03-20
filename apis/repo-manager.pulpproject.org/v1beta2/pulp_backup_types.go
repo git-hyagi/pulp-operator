@@ -78,8 +78,6 @@ type PulpBackupSpec struct {
 	Affinity *corev1.Affinity `json:"affinity,omitempty"`
 }
 
-//+kubebuilder:unservedversion
-
 // PulpBackupStatus defines the observed state of PulpBackup
 type PulpBackupStatus struct {
 	//+operator-sdk:csv:customresourcedefinitions:type=status,xDescriptors={"urn:alm:descriptor:io.kubernetes.conditions"}
