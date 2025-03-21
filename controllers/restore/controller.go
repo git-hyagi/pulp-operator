@@ -158,16 +158,16 @@ func (r *RepoManagerRestoreReconciler) Reconcile(ctx context.Context, req ctrl.R
 		return ctrl.Result{}, err
 	}
 
+	// Restoring database
+	if err := r.restoreDatabaseData(ctx, pulpRestore, backupDir, pod); err != nil {
+		// requeue request when there is an error with a database restore
+		return ctrl.Result{}, err
+	}
+
 	// Restoring pulp CR
 	podReplicas, err := r.restorePulpCR(ctx, pulpRestore, backupDir, pod)
 	if err != nil {
 		// requeue request when there is an error with a pulp CR restore
-		return ctrl.Result{}, err
-	}
-
-	// Restoring database
-	if err := r.restoreDatabaseData(ctx, pulpRestore, backupDir, pod); err != nil {
-		// requeue request when there is an error with a database restore
 		return ctrl.Result{}, err
 	}
 
