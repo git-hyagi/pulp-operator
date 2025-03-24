@@ -6,6 +6,7 @@ kubectl config set-context --current --namespace=pulp-operator-system
 
 BACKUP_RESOURCE=repo-manager.pulpproject.org_v1_pulpbackup.yaml
 RESTORE_RESOURCE=repo-manager.pulpproject.org_v1_pulprestore.yaml
+PULP_CR=example-pulp
 
 if [[ "$CI_TEST" == "true" ]]; then
   CUSTOM_RESOURCE=simple.yaml
@@ -36,7 +37,7 @@ kubectl delete -f config/samples/$CUSTOM_RESOURCE
 # deleting resources that have no operator owerReference to better validate that
 # restore controller will recreate them instead of "reusing" the older ones
 kubectl delete secrets --all
-kubectl delete pvc -l pulp_cr=test-pulp
+kubectl delete pvc -l pulp_cr=$PULP_CR
 kubectl wait --for=delete --timeout=300s -f config/samples/$CUSTOM_RESOURCE
 
 kubectl apply -f config/samples/$RESTORE_RESOURCE
@@ -48,7 +49,7 @@ kubectl logs -l app.kubernetes.io/name=pulp-operator -c manager --tail=10000
 echo ::endgroup::
 
 sudo pkill -f "port-forward" || true
-time kubectl wait --for condition=Pulp-Operator-Finished-Execution pulp.repo-manager.pulpproject.org/test-pulp --timeout=800s
+time kubectl wait --for condition=Pulp-Operator-Finished-Execution pulp.repo-manager.pulpproject.org/$PULP_CR --timeout=800s
 kubectl get pods -o wide
 
 KUBE="k3s"
