@@ -50,3 +50,8 @@ spec:
 
   ingress_type: nodeport
   nodeport_port: 30000
+
+  # workaround for a permission bug in nginx image
+  image_web_version: 3.63.4
+  inhibit_version_constraint: true
+

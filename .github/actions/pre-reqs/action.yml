@@ -6,6 +6,8 @@ inputs:
     required: false
   deploy:
     required: false
+  minikube-version:
+    required: false
 runs:
   using: "composite"
   steps:
@@ -58,7 +60,11 @@ runs:
     - name: Start minikube
       if: ${{ !inputs.deploy }}
       run: |
-        minikube start --memory=max --cpus=max --vm-driver=docker --extra-config=apiserver.service-node-port-range=80-32000
+        if [[ -z "${{ inputs.minikube-version }}" ]] ; then
+          minikube start --memory=max --cpus=max --driver=docker --extra-config=apiserver.service-node-port-range=80-32000 --kubernetes-version=${{ inputs.minikube-version }}
+        else
+          minikube start --memory=max --cpus=max --vm-driver=docker --extra-config=apiserver.service-node-port-range=80-32000
+        fi
         minikube addons enable metrics-server
         minikube addons enable ingress
       shell: bash

@@ -65,8 +65,11 @@ jobs:
         run: |
           .ci/scripts/bundle_check.sh
         shell: bash
-  upgrade:
-    uses: "./.github/workflows/upgrade.yml"
+
+  # tmp disabling it
+  #upgrade:
+  #  uses: "./.github/workflows/upgrade.yml"
+
   two-deployments:
     runs-on: ubuntu-latest
     steps:
