@@ -364,6 +364,7 @@ jobs:
           - COMPONENT_TYPE: ldap
           - COMPONENT_TYPE: external-db
           - COMPONENT_TYPE: s3
+          - COMPONENT_TYPE: azure
     steps:
       - uses: actions/checkout@v4
         with:
@@ -457,6 +458,10 @@ jobs:
             kubectl apply -f .ci/assets/kubernetes/pulp-admin-password.secret.yaml
             kubectl apply -f .ci/assets/kubernetes/pulp-object-storage.aws.secret.yaml
             kubectl apply -f config/samples/simple.s3.ci.yaml
+          elif [[ "$COMPONENT_TYPE" == "azure" ]]; then
+            kubectl config set-context --current --namespace=pulp-operator-system
+            kubectl apply -f .ci/assets/kubernetes/pulp-object-storage.azure.secret.yaml
+            kubectl apply -f config/samples/simple.azure.ci.yaml
           else
             kubectl apply -f config/samples/simple.yaml
           fi
