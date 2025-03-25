@@ -152,7 +152,10 @@ jobs:
           kubectl apply -f config/samples/simple.yaml
         shell: bash
       - name: Check and wait pulp-operator deploy
-        run: kubectl wait --for condition=Pulp-Operator-Finished-Execution pulp/example-pulp --timeout=900s
+        run: |
+          journalctl --unit=pulp-operator -f &
+          kubectl logs -f -l app.kubernetes.io/component=operator -c manager &
+          kubectl wait --for condition=Pulp-Operator-Finished-Execution pulp/example-pulp --timeout=900s
         shell: bash
       - name: Test all components
         run: |
@@ -184,7 +187,10 @@ jobs:
           kubectl apply -f config/samples/simple.yaml
         shell: bash
       - name: Check and wait pulp-operator deploy
-        run: kubectl wait --for condition=Pulp-Operator-Finished-Execution pulp/example-pulp --timeout=900s
+        run: |
+          journalctl --unit=pulp-operator -f &
+          kubectl logs -f -l app.kubernetes.io/component=operator -c manager &
+          kubectl wait --for condition=Pulp-Operator-Finished-Execution pulp/example-pulp --timeout=900s
         shell: bash
       - name: KubeLinter
         if: github.event_name == 'pull_request'
