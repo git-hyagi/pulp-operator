@@ -8,8 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Setup Go environment
         uses: actions/setup-go@v5
         with:
@@ -65,6 +63,12 @@ jobs:
         with:
           repository: pulp/pulp-operator
           ref: main
+      # not pushed to main yet
+      #- uses: ./.github/actions/pre-reqs
+      #  with:
+      #    ingress-type:  ${{ matrix.INGRESS_TYPE }}
+
+      ## TO-DO: remove after merging to main and use actions/pre-reqs
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
@@ -114,15 +118,27 @@ jobs:
           minikube start --memory=max --cpus=max --vm-driver=docker --extra-config=apiserver.service-node-port-range=80-32000
           minikube addons enable metrics-server
           minikube addons enable ingress
-        # now you can run kubectl to see the pods in the cluster
+        shell: bash
       - name: Try the cluster !
         run: kubectl get pods -A
+        shell: bash
       - name: Setup a minikube docker env
         run: minikube -p minikube docker-env | grep "export" | sed 's/export //' | sed 's/"//g' >> $GITHUB_ENV
+        shell: bash
+      - name: Check code format and generate manifests
+        run: |
+          make manifests generate fmt vet
+        shell: bash
       - name: Prepare Object Storage
         run: |
+          if [[ "${{ inputs.component-type }}" == "s3" ]]; then
+            echo "CI_TEST_STORAGE=s3" >> $GITHUB_ENV
+          fi
           .ci/scripts/prepare-object-storage.sh
         shell: bash
+      ## TO-DO: remove until here
+
+
       - name: Deploy pulp-operator to K8s
         run: |
           make local
