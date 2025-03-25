@@ -480,7 +480,11 @@ jobs:
         env:
           PY_COLORS: '1'
       - name: Backup & Restore
-        run: .ci/scripts/backup_and_restore.sh -m
+        run: |
+          # we do not support backup/restore of external DB
+          if [[ "$COMPONENT_TYPE" != "external-db" ]]; then
+            .ci/scripts/backup_and_restore.sh -m
+          fi
         shell: bash
       - name: Logs
         if: always()
