@@ -200,7 +200,6 @@ func checkRouteNotOCP(log logr.Logger, pulp *pulpv1.Pulp) *ctrl.Result {
 func checkImmutableFields(ctx context.Context, r *RepoManagerReconciler, pulp *pulpv1.Pulp) *ctrl.Result {
 	// Checking immutable fields update
 	immutableFields := []immutableField{
-		{FieldName: "DeploymentType", FieldPath: pulpv1.PulpSpec{}},
 		{FieldName: "ObjectStorageAzureSecret", FieldPath: pulpv1.PulpSpec{}},
 		{FieldName: "ObjectStorageS3Secret", FieldPath: pulpv1.PulpSpec{}},
 		{FieldName: "DBFieldsEncryptionSecret", FieldPath: pulpv1.PulpSpec{}},

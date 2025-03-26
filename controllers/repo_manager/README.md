@@ -252,7 +252,6 @@ PulpStatus defines the observed state of Pulp
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
 | conditions |  | []metav1.Condition | true |
-| deployment_type | Name of the deployment type. | string | false |
 | object_storage_azure_secret | The secret for Azure compliant object storage configuration. | string | false |
 | object_storage_s3_secret | The secret for S3 compliant object storage configuration. | string | false |
 | db_fields_encryption_secret | Secret where the Fernet symmetric encryption key is stored. | string | false |

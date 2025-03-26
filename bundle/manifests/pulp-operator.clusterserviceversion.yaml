@@ -46,7 +46,6 @@ metadata:
             "admin_password_secret": "example-pulp-admin-password",
             "backup_storage_class": "standard",
             "deployment_name": "example-pulp",
-            "deployment_type": "pulp",
             "postgres_configuration_secret": "example-pulp-postgres-configuration"
           }
         },
@@ -65,7 +64,7 @@ metadata:
     capabilities: Full Lifecycle
     categories: Integration & Delivery
     containerImage: quay.io/pulp/pulp-operator:devel
-    createdAt: "2025-03-26T00:59:39Z"
+    createdAt: "2025-03-26T01:31:04Z"
     description: Pulp is a platform for managing repositories of software packages
       and making them available to a large number of consumers.
     operators.operatorframework.io/builder: operator-sdk-v1.29.0

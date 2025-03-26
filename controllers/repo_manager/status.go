@@ -173,7 +173,6 @@ func setStatusFields(ctx context.Context, pulp *pulpv1.Pulp, r RepoManagerReconc
 		verifyFunc func(*pulpv1.Pulp) bool
 		fieldName  string
 	}{
-		{verifyFunc: deploymentTypeCondition(), fieldName: "DeploymentType"},
 		{verifyFunc: objAzureSecretCondition(), fieldName: "ObjectStorageAzureSecret"},
 		{verifyFunc: objS3SecretCondition(), fieldName: "ObjectStorageS3Secret"},
 		{verifyFunc: dbFieldsEncrSecretCondition(), fieldName: "DBFieldsEncryptionSecret"},
@@ -218,11 +217,6 @@ func setStatusFields(ctx context.Context, pulp *pulpv1.Pulp, r RepoManagerReconc
 		r.Status().Update(ctx, pulp)
 	}
 
-}
-
-// deploymentTypeCondition returns the function to verify if a new pulp.Status.DeploymentType should be set
-func deploymentTypeCondition() func(*pulpv1.Pulp) bool {
-	return func(pulp *pulpv1.Pulp) bool { return len(pulp.Status.DeploymentType) == 0 }
 }
 
 // objAzureSecretCondition returns the function to verify if a new pulp.Status.ObjectStorageAzureSecret should be set

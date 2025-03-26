@@ -941,8 +941,6 @@ type LDAP struct {
 type PulpStatus struct {
 	//+operator-sdk:csv:customresourcedefinitions:type=status,xDescriptors={"urn:alm:descriptor:io.kubernetes.conditions"}
 	Conditions []metav1.Condition `json:"conditions"`
-	// Name of the deployment type.
-	DeploymentType string `json:"deployment_type,omitempty"`
 	// The secret for Azure compliant object storage configuration.
 	ObjectStorageAzureSecret string `json:"object_storage_azure_secret,omitempty"`
 	// The secret for S3 compliant object storage configuration.

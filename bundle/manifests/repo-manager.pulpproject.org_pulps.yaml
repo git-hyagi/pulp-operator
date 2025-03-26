@@ -10564,9 +10564,6 @@ spec:
               db_fields_encryption_secret:
                 description: Secret where the Fernet symmetric encryption key is stored.
                 type: string
-              deployment_type:
-                description: Name of the deployment type.
-                type: string
               external_cache_secret:
                 description: Name of the secret with the parameters to connect to
                   an external Redis cluster
