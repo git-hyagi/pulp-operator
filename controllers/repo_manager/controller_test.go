@@ -841,7 +841,6 @@ exec "${PULP_CONTENT_ENTRYPOINT[@]}" \
 				Namespace: PulpNamespace,
 			},
 			Spec: pulpv1.PulpSpec{
-				DeploymentType: OperatorType,
 				Cache: pulpv1.Cache{
 					Enabled:           true,
 					RedisStorageClass: "standard",

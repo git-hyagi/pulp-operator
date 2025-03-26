@@ -39,7 +39,7 @@ import (
 func (r *RepoManagerReconciler) createSecrets(ctx context.Context, pulp *pulpv1.Pulp) (*ctrl.Result, error) {
 
 	// conditionType is used to update .status.conditions with the current resource state
-	conditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-API-Ready"
+	conditionType := "Pulp-API-Ready"
 
 	// if .spec.admin_password_secret is not defined, operator will default to pulp-admin-password
 	adminSecretName := settings.DefaultAdminPassword(pulp.Name)

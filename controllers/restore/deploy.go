@@ -145,12 +145,3 @@ func (r *RepoManagerRestoreReconciler) scaleDeployments(ctx context.Context, pul
 
 	return nil
 }
-
-// getDeploymentType returns the deployment_type (if not provided default is "pulp")
-func getDeploymentType(pulp *pulpv1.Pulp) string {
-	deploymentType := pulp.Spec.DeploymentType
-	if len(pulp.Spec.DeploymentType) == 0 {
-		deploymentType = "pulp"
-	}
-	return deploymentType
-}

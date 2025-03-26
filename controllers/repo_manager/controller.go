@@ -265,10 +265,6 @@ func pulpCoreTasks(ctx context.Context, pulp *pulpv1.Pulp, r RepoManagerReconcil
 		return &pulpController, err
 	}
 
-	if pulpController, err := r.galaxy(controllers.FunctionResources{Context: ctx, Client: r.Client, Pulp: pulp, Scheme: r.Scheme, Logger: log}); needsRequeue(err, pulpController) {
-		return &pulpController, err
-	}
-
 	// remove telemetry resources in case it is not enabled anymore
 	if pulp.Status.TelemetryEnabled && !pulp.Spec.Telemetry.Enabled {
 		controllers.RemoveTelemetryResources(controllers.FunctionResources{Context: ctx, Client: r.Client, Pulp: pulp, Scheme: r.Scheme, Logger: log})

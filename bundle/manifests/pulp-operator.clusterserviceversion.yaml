@@ -65,7 +65,7 @@ metadata:
     capabilities: Full Lifecycle
     categories: Integration & Delivery
     containerImage: quay.io/pulp/pulp-operator:devel
-    createdAt: "2025-03-20T22:59:43Z"
+    createdAt: "2025-03-26T00:59:39Z"
     description: Pulp is a platform for managing repositories of software packages
       and making them available to a large number of consumers.
     operators.operatorframework.io/builder: operator-sdk-v1.29.0
@@ -106,12 +106,9 @@ spec:
       - description: Storage requirements for the backup
         displayName: Backup Storage Req
         path: backup_storage_requirements
-      - description: Name of the deployment to be backed up
+      - description: Name of Pulp CR to be backed up
         displayName: Deployment Name
         path: deployment_name
-      - description: Name of the deployment type. Can be one of {galaxy,pulp}.
-        displayName: Deployment Type
-        path: deployment_type
       - description: Secret where the database configuration can be found
         displayName: Database configuration
         path: postgres_configuration_secret
@@ -152,19 +149,16 @@ spec:
           (backupDirectory)
         displayName: Backup Dir
         path: backup_dir
-      - description: Name of the backup custom resource
+      - description: Name of PulpBackup CR
         displayName: Backup Name
         path: backup_name
       - description: Name of the PVC to be restored from, set as a status found on
           the backup object (backupClaim)
         displayName: Backup PVC
         path: backup_pvc
-      - description: Name of the deployment to be restored to
+      - description: Name of Pulp CR to be restored
         displayName: Deployment Name
         path: deployment_name
-      - description: Name of the deployment type. Can be one of {galaxy,pulp}.
-        displayName: Deployment Type
-        path: deployment_type
       - description: KeepBackupReplicasCount allows to define if the restore controller
           should restore the components with the same number of replicas from backup
           or restore only a single replica each.
@@ -611,11 +605,6 @@ spec:
           Execution Environments. Default: false'
         displayName: Deploy EEDefaults
         path: deploy_ee_defaults
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-      - description: 'Name of the deployment type. Default: "pulp"'
-        displayName: Deployment Type
-        path: deployment_type
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: Disable database migrations. Useful for situations in which we

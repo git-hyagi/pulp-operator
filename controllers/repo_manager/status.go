@@ -71,22 +71,22 @@ func (r *RepoManagerReconciler) setStatusConditions(ctx context.Context, pulp *p
 		{
 			Type:          string(settings.CONTENT),
 			Name:          settings.CONTENT.DeploymentName(pulp.Name),
-			ConditionType: cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Content-Ready",
+			ConditionType: "Pulp-Content-Ready",
 		},
 		{
 			Type:          string(settings.API),
 			Name:          settings.API.DeploymentName(pulp.Name),
-			ConditionType: cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-API-Ready",
+			ConditionType: "Pulp-API-Ready",
 		},
 		{
 			Type:          string(settings.WORKER),
 			Name:          settings.WORKER.DeploymentName(pulp.Name),
-			ConditionType: cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Worker-Ready",
+			ConditionType: "Pulp-Worker-Ready",
 		},
 		{
 			Type:          string(settings.WEB),
 			Name:          settings.WEB.DeploymentName(pulp.Name),
-			ConditionType: cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Web-Ready",
+			ConditionType: "Pulp-Web-Ready",
 		},
 	}
 
@@ -131,10 +131,10 @@ func (r *RepoManagerReconciler) setStatusConditions(ctx context.Context, pulp *p
 	}
 
 	// if we get into here it means that all components are READY, so operator finished its execution
-	if v1.IsStatusConditionFalse(pulp.Status.Conditions, cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType)+"-Operator-Finished-Execution") {
+	if v1.IsStatusConditionFalse(pulp.Status.Conditions, "Pulp-Operator-Finished-Execution") {
 		r.Get(ctx, types.NamespacedName{Name: pulp.Name, Namespace: pulp.Namespace}, pulp)
 		v1.SetStatusCondition(&pulp.Status.Conditions, metav1.Condition{
-			Type:               cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Operator-Finished-Execution",
+			Type:               "Pulp-Operator-Finished-Execution",
 			Status:             metav1.ConditionTrue,
 			Reason:             "OperatorFinishedExecution",
 			LastTransitionTime: metav1.Now(),

@@ -23,8 +23,6 @@ import (
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/api/meta"
@@ -36,7 +34,7 @@ import (
 func (r *RepoManagerReconciler) pulpWorkerController(ctx context.Context, pulp *pulpv1.Pulp, log logr.Logger) (ctrl.Result, error) {
 
 	// conditionType is used to update .status.conditions with the current resource state
-	conditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Worker-Ready"
+	conditionType := "Pulp-Worker-Ready"
 
 	// temporary workaround that creates a configmap to be used as a readiness probe when ipv6 is disabled (pending oci-image update)
 	if requeue, err := r.createProbeConfigMap(ctx, pulp, conditionType); err != nil || requeue != nil {

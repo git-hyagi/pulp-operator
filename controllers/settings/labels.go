@@ -5,23 +5,21 @@ import (
 )
 
 func PulpcoreLabels(pulp pulpv1.Pulp, pulpType string) map[string]string {
-	deploymentType := pulp.Spec.DeploymentType
 	return map[string]string{
-		"app.kubernetes.io/name":       deploymentType + "-" + pulpType,
-		"app.kubernetes.io/instance":   deploymentType + "-" + pulpType + "-" + pulp.Name,
+		"app.kubernetes.io/name":       "pulp-" + pulpType,
+		"app.kubernetes.io/instance":   "pulp-" + pulpType + "-" + pulp.Name,
 		"app.kubernetes.io/component":  pulpType,
-		"app.kubernetes.io/part-of":    deploymentType,
-		"app.kubernetes.io/managed-by": deploymentType + "-operator",
+		"app.kubernetes.io/part-of":    "pulp",
+		"app.kubernetes.io/managed-by": "pulp-operator",
 		"app":                          "pulp-" + pulpType,
 		"pulp_cr":                      pulp.Name,
 	}
 }
 
 func CommonLabels(pulp pulpv1.Pulp) map[string]string {
-	deploymentType := pulp.Spec.DeploymentType
 	return map[string]string{
-		"app.kubernetes.io/part-of":    deploymentType,
-		"app.kubernetes.io/managed-by": deploymentType + "-operator",
+		"app.kubernetes.io/part-of":    "pulp",
+		"app.kubernetes.io/managed-by": "pulp-operator",
 		"pulp_cr":                      pulp.Name,
 	}
 }

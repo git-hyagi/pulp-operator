@@ -37,15 +37,6 @@ func getDeploymentName(ctx context.Context, pulpBackup *pulpv1.PulpBackup) strin
 	return pulpBackup.Spec.DeploymentName
 }
 
-// getDeploymentType returns the deployment_type
-func getDeploymentType(ctx context.Context, pulpBackup *pulpv1.PulpBackup) string {
-	deploymentType := pulpBackup.Spec.DeploymentType
-	if len(pulpBackup.Spec.DeploymentType) == 0 {
-		deploymentType = "pulp"
-	}
-	return deploymentType
-}
-
 // getAdminPasswordSecret returns the admin_password_secret if provided, if not will return the default one based
 // on deployment_name
 func getAdminPasswordSecret(ctx context.Context, pulpBackup *pulpv1.PulpBackup) string {

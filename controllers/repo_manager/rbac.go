@@ -24,8 +24,6 @@ import (
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -88,20 +86,20 @@ func (r *RepoManagerReconciler) CreateRole(ctx context.Context, pulp *pulpv1.Pul
 	err := r.Get(ctx, types.NamespacedName{Name: pulp.Name, Namespace: pulp.Namespace}, role)
 	expectedRole := r.pulpRole(pulp)
 	if err != nil && errors.IsNotFound(err) {
-		log.Info("Creating a new "+pulp.Spec.DeploymentType+" Role", "Namespace", expectedRole.Namespace, "Name", expectedRole.Name)
+		log.Info("Creating a new Pulp Role", "Namespace", expectedRole.Namespace, "Name", expectedRole.Name)
 		controllers.UpdateStatus(ctx, r.Client, pulp, metav1.ConditionFalse, conditionType, "CreatingRole", "Creating "+pulp.Name+" Role resource")
 		err = r.Create(ctx, expectedRole)
 		if err != nil {
-			log.Error(err, "Failed to create new "+pulp.Spec.DeploymentType+" ServiceAccount", "Namespace", expectedRole.Namespace, "Name", expectedRole.Name)
+			log.Error(err, "Failed to create new Pulp ServiceAccount", "Namespace", expectedRole.Namespace, "Name", expectedRole.Name)
 			controllers.UpdateStatus(ctx, r.Client, pulp, metav1.ConditionFalse, conditionType, "ErrorCreatingRole", "Failed to create "+pulp.Name+" Role: "+err.Error())
-			r.recorder.Event(pulp, corev1.EventTypeWarning, "Failed", "Failed to create new "+pulp.Spec.DeploymentType+" Role")
+			r.recorder.Event(pulp, corev1.EventTypeWarning, "Failed", "Failed to create new Pulp Role")
 			return ctrl.Result{}, err
 		}
 		// Role created successfully - return and requeue
-		r.recorder.Event(pulp, corev1.EventTypeNormal, "Created", pulp.Spec.DeploymentType+" Role created")
+		r.recorder.Event(pulp, corev1.EventTypeNormal, "Created", "Pulp Role created")
 		return ctrl.Result{Requeue: true}, nil
 	} else if err != nil {
-		log.Error(err, "Failed to get "+pulp.Spec.DeploymentType+" Role")
+		log.Error(err, "Failed to get Pulp Role")
 		return ctrl.Result{}, err
 	}
 	return r.CreateRoleBinding(ctx, pulp)
@@ -114,20 +112,20 @@ func (r *RepoManagerReconciler) CreateRoleBinding(ctx context.Context, pulp *pul
 	err := r.Get(ctx, types.NamespacedName{Name: pulp.Name, Namespace: pulp.Namespace}, rolebinding)
 	expectedRoleBinding := r.pulpRoleBinding(pulp)
 	if err != nil && errors.IsNotFound(err) {
-		log.Info("Creating a new "+pulp.Spec.DeploymentType+" RoleBinding", "Namespace", expectedRoleBinding.Namespace, "Name", expectedRoleBinding.Name)
+		log.Info("Creating a new Pulp RoleBinding", "Namespace", expectedRoleBinding.Namespace, "Name", expectedRoleBinding.Name)
 		controllers.UpdateStatus(ctx, r.Client, pulp, metav1.ConditionFalse, conditionType, "CreatingRoleBinding", "Creating "+pulp.Name+" RoleBinding resource")
 		err = r.Create(ctx, expectedRoleBinding)
 		if err != nil {
-			log.Error(err, "Failed to create new "+pulp.Spec.DeploymentType+" ServiceAccount", "Namespace", expectedRoleBinding.Namespace, "Name", expectedRoleBinding.Name)
+			log.Error(err, "Failed to create new Pulp ServiceAccount", "Namespace", expectedRoleBinding.Namespace, "Name", expectedRoleBinding.Name)
 			controllers.UpdateStatus(ctx, r.Client, pulp, metav1.ConditionFalse, conditionType, "ErrorCreatingRoleBinding", "Failed to create "+pulp.Name+" RoleBinding: "+err.Error())
-			r.recorder.Event(pulp, corev1.EventTypeWarning, "Failed", "Failed to create new "+pulp.Spec.DeploymentType+" RoleBinding")
+			r.recorder.Event(pulp, corev1.EventTypeWarning, "Failed", "Failed to create new Pulp RoleBinding")
 			return ctrl.Result{}, err
 		}
 		// RoleBinding created successfully - return and requeue
-		r.recorder.Event(pulp, corev1.EventTypeNormal, "Created", pulp.Spec.DeploymentType+" RoleBinding created")
+		r.recorder.Event(pulp, corev1.EventTypeNormal, "Created", "Pulp RoleBinding created")
 		return ctrl.Result{Requeue: true}, nil
 	} else if err != nil {
-		log.Error(err, "Failed to get "+pulp.Spec.DeploymentType+" RoleBinding")
+		log.Error(err, "Failed to get Pulp RoleBinding")
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
@@ -146,7 +144,7 @@ func (r *RepoManagerReconciler) pulpSA(m *pulpv1.Pulp) *corev1.ServiceAccount {
 		labels = make(map[string]string)
 	}
 	labels["app.kubernetes.io/name"] = m.Name + "-sa"
-	labels["app.kubernetes.io/part-of"] = m.Spec.DeploymentType
+	labels["app.kubernetes.io/part-of"] = "pulp"
 
 	sa := &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
@@ -186,7 +184,7 @@ func (r *RepoManagerReconciler) pulpRole(m *pulpv1.Pulp) *rbacv1.Role {
 			Namespace: m.Namespace,
 			Labels: map[string]string{
 				"app.kubernetes.io/name":    m.Name + "-role",
-				"app.kubernetes.io/part-of": m.Spec.DeploymentType,
+				"app.kubernetes.io/part-of": "pulp",
 			},
 		},
 		Rules: []rbacv1.PolicyRule{
@@ -216,7 +214,7 @@ func (r *RepoManagerReconciler) pulpRoleBinding(m *pulpv1.Pulp) *rbacv1.RoleBind
 			Namespace: m.Namespace,
 			Labels: map[string]string{
 				"app.kubernetes.io/name":    m.Name + "-rolebinding",
-				"app.kubernetes.io/part-of": m.Spec.DeploymentType,
+				"app.kubernetes.io/part-of": "pulp",
 			},
 		},
 		Subjects: []rbacv1.Subject{
@@ -235,7 +233,7 @@ func (r *RepoManagerReconciler) pulpRoleBinding(m *pulpv1.Pulp) *rbacv1.RoleBind
 
 // getConditionType returns a string with the .status.conditions.type from API resource
 func getApiConditionType(m *pulpv1.Pulp) string {
-	return cases.Title(language.English, cases.Compact).String(m.Spec.DeploymentType) + "-API-Ready"
+	return "Pulp-API-Ready"
 }
 
 // saModified returns true if some specific fields from a SA differs from the expected

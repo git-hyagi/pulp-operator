@@ -35,8 +35,6 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/crypto/openpgp"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	netv1 "k8s.io/api/networking/v1"
@@ -421,9 +419,9 @@ func UpdateStatus(ctx context.Context, r client.Client, pulp *pulpv1.Pulp, condi
 
 	// if we are updating a status it means that operator didn't finish its execution
 	// set Pulp-Operator-Finished-Execution to false
-	if v1.IsStatusConditionPresentAndEqual(pulp.Status.Conditions, cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType)+"-Operator-Finished-Execution", metav1.ConditionTrue) {
+	if v1.IsStatusConditionPresentAndEqual(pulp.Status.Conditions, "Pulp-Operator-Finished-Execution", metav1.ConditionTrue) {
 		v1.SetStatusCondition(&pulp.Status.Conditions, metav1.Condition{
-			Type:               cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Operator-Finished-Execution",
+			Type:               "Pulp-Operator-Finished-Execution",
 			Status:             metav1.ConditionFalse,
 			Reason:             "OperatorRunning",
 			LastTransitionTime: metav1.Now(),
@@ -783,7 +781,7 @@ func RemovePulpWebResources(resources FunctionResources) error {
 		return err
 	}
 
-	webConditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Web-Ready"
+	webConditionType := "Pulp-Web-Ready"
 	v1.RemoveStatusCondition(&pulp.Status.Conditions, webConditionType)
 
 	return nil

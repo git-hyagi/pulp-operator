@@ -25,8 +25,6 @@ import (
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/api/meta"
@@ -69,7 +67,7 @@ func PulpRouteController(resources controllers.FunctionResources, restClient res
 	ctx := resources.Context
 
 	// conditionType is used to update .status.conditions with the current resource state
-	conditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Route-Ready"
+	conditionType := "Pulp-Route-Ready"
 
 	podList := &corev1.PodList{}
 	labels := settings.PulpcoreLabels(*pulp, "worker")

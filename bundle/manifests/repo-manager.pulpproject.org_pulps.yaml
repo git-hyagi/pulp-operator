@@ -7104,15 +7104,6 @@ spec:
                   Define if the operator should or should not deploy the default Execution Environments.
                   Default: false
                 type: boolean
-              deployment_type:
-                default: pulp
-                description: |-
-                  Name of the deployment type.
-                  Default: "pulp"
-                enum:
-                - pulp
-                - galaxy
-                type: string
               disable_migrations:
                 description: |-
                   Disable database migrations. Useful for situations in which we don't want

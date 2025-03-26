@@ -22,8 +22,6 @@ import (
 	"github.com/pulp/pulp-operator/controllers"
 	pulp_ocp "github.com/pulp/pulp-operator/controllers/ocp"
 	"github.com/pulp/pulp-operator/controllers/settings"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -212,7 +210,7 @@ func (r *RepoManagerReconciler) updateIngressType(ctx context.Context, pulp *pul
 			client.MatchingLabels(routesLabelSelector),
 		}
 		r.DeleteAllOf(ctx, route, listOpts...)
-		routeConditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Route-Ready"
+		routeConditionType := "Pulp-Route-Ready"
 		v1.RemoveStatusCondition(&pulp.Status.Conditions, routeConditionType)
 
 		pulp.Status.IngressType = pulp.Spec.IngressType
@@ -234,7 +232,7 @@ func (r *RepoManagerReconciler) updateIngressType(ctx context.Context, pulp *pul
 			client.MatchingLabels(ingresssLabelSelector),
 		}
 		r.DeleteAllOf(ctx, ingress, listOpts...)
-		ingressConditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Ingress-Ready"
+		ingressConditionType := "Pulp-Ingress-Ready"
 		v1.RemoveStatusCondition(&pulp.Status.Conditions, ingressConditionType)
 
 		pulp.Status.IngressType = pulp.Spec.IngressType
@@ -288,7 +286,7 @@ func (r *RepoManagerReconciler) updateIngressClass(ctx context.Context, pulp *pu
 		if err := r.Get(ctx, types.NamespacedName{Name: settings.PulpWebService(pulp.Name), Namespace: pulp.Namespace}, webSvc); err == nil {
 			r.Delete(ctx, webSvc)
 		}
-		webConditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Web-Ready"
+		webConditionType := "Pulp-Web-Ready"
 		v1.RemoveStatusCondition(&pulp.Status.Conditions, webConditionType)
 
 		// or the new one does not use nginx controller anymore
@@ -298,7 +296,7 @@ func (r *RepoManagerReconciler) updateIngressClass(ctx context.Context, pulp *pu
 		r.Get(ctx, types.NamespacedName{Name: pulp.Name, Namespace: pulp.Namespace}, ingress)
 		r.Delete(ctx, ingress)
 
-		ingressConditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Ingress-Ready"
+		ingressConditionType := "Pulp-Ingress-Ready"
 		v1.RemoveStatusCondition(&pulp.Status.Conditions, ingressConditionType)
 	}
 

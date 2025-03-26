@@ -13,7 +13,6 @@ import (
 func (r *RepoManagerBackupReconciler) backupCR(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
 	deploymentName := getDeploymentName(ctx, pulpBackup)
-	deploymentType := getDeploymentType(ctx, pulpBackup)
 
 	// we are considering that pulp CR instance is running in the same namespace as pulpbackup and
 	// that there is only a single instance of pulp CR available
@@ -26,14 +25,14 @@ func (r *RepoManagerBackupReconciler) backupCR(ctx context.Context, pulpBackup *
 	}
 
 	// CR BACKUP
-	log.Info("Starting " + deploymentType + " CR backup process ...")
+	log.Info("Starting Pulp CR backup process ...")
 	pulpSpec, _ := json.Marshal(pulp.Spec)
 	execCmd := []string{
 		"bash", "-c", "echo '" + string(pulpSpec) + "' > " + backupDir + "/cr_object",
 	}
 	_, err = controllers.ContainerExec(r, pod, execCmd, pulpBackup.Name+"-backup-manager", pod.Namespace)
 	if err != nil {
-		log.Error(err, "Failed to backup "+deploymentType+" CR")
+		log.Error(err, "Failed to backup Pulp CR")
 		return err
 	}
 	return nil

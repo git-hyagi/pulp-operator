@@ -26,8 +26,6 @@ import (
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -43,7 +41,7 @@ import (
 func (r *RepoManagerReconciler) databaseController(ctx context.Context, pulp *pulpv1.Pulp, log logr.Logger) (ctrl.Result, error) {
 
 	// conditionType is used to update .status.conditions with the current resource state
-	conditionType := cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Database-Ready"
+	conditionType := "Pulp-Database-Ready"
 
 	secretName := settings.DefaultDBSecret(pulp.Name)
 	// Create pulp-postgres-configuration secret
@@ -358,7 +356,7 @@ func statefulSetForDatabase(m *pulpv1.Pulp) *appsv1.StatefulSet {
 						"/bin/sh",
 						"-i",
 						"-c",
-						"pg_isready -U " + m.Spec.DeploymentType + " -h 127.0.0.1 -p 5432",
+						"pg_isready -U pulp -h 127.0.0.1 -p 5432",
 					},
 				},
 			},
@@ -379,7 +377,7 @@ func statefulSetForDatabase(m *pulpv1.Pulp) *appsv1.StatefulSet {
 						"/bin/sh",
 						"-i",
 						"-c",
-						"pg_isready -U " + m.Spec.DeploymentType + " -h 127.0.0.1 -p 5432",
+						"pg_isready -U pulp -h 127.0.0.1 -p 5432",
 					},
 				},
 			},
@@ -520,8 +518,8 @@ func databaseConfigSecret(m *pulpv1.Pulp) *corev1.Secret {
 		},
 		StringData: map[string]string{
 			"password": createPwd(32),
-			"username": m.Spec.DeploymentType,
-			"database": m.Spec.DeploymentType,
+			"username": "pulp",
+			"database": "pulp",
 			"port":     "5432",
 			"host":     m.Name + "-database-svc",
 			"sslmode":  sslMode,

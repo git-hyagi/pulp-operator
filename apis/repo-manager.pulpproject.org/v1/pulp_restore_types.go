@@ -23,20 +23,13 @@ import (
 // PulpRestoreSpec defines the desired state of PulpRestore
 type PulpRestoreSpec struct {
 
-	// Name of the deployment type. Can be one of {galaxy,pulp}.
-	// +kubebuilder:validation:Optional
-	// +kubebuilder:validation:Enum:=galaxy;pulp
-	// +kubebuilder:default:="pulp"
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	DeploymentType string `json:"deployment_type"`
-
-	// Name of the deployment to be restored to
+	// Name of Pulp CR to be restored
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default:="pulp"
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	DeploymentName string `json:"deployment_name"`
 
-	// Name of the backup custom resource
+	// Name of PulpBackup CR
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	BackupName string `json:"backup_name"`
 

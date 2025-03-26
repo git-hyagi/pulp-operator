@@ -24,12 +24,7 @@ import (
 // PulpBackupSpec defines the desired state of PulpBackup
 type PulpBackupSpec struct {
 
-	// Name of the deployment type. Can be one of {galaxy,pulp}.
-	// +kubebuilder:validation:Optional
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	DeploymentType string `json:"deployment_type"`
-
-	// Name of the deployment to be backed up
+	// Name of Pulp CR to be backed up
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	DeploymentName string `json:"deployment_name"`

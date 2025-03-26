@@ -73,7 +73,6 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		return ctrl.Result{}, err
 	}
 	backupDir := getBackupDir(ctx, pulpBackup, formattedCurrentTime)
-	deploymentType := getDeploymentType(ctx, pulpBackup)
 
 	if err := checkRequiredFields(ctx, pulpBackup); err != nil {
 		log.Error(err, "Required field not filled in backup CR!")
@@ -130,10 +129,10 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		return ctrl.Result{}, err
 	}
 
-	r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Running "+deploymentType+" dir backup ...", "BackupDir")
+	r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Running Pulp dir backup ...", "BackupDir")
 	err = r.backupPulpDir(ctx, pulpBackup, backupDir, pod)
 	if err != nil {
-		r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Failed to backup "+deploymentType+" dir!", "FailedBackupDir")
+		r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Failed to backup Pulp dir!", "FailedBackupDir")
 		return ctrl.Result{}, err
 	}
 
@@ -144,7 +143,7 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		log.Error(err, "Failed to update backup CR status!")
 	}
 	r.updateStatus(ctx, pulpBackup, metav1.ConditionTrue, "BackupComplete", "All backup tasks run!", "BackupTasksFinished")
-	log.Info(deploymentType + " CR Backup finished!")
+	log.Info("Pulp CR Backup finished!")
 
 	return ctrl.Result{}, nil
 }
@@ -169,7 +168,6 @@ func (r *RepoManagerBackupReconciler) createBackupPod(ctx context.Context, pulpB
 	log := r.RawLogger
 
 	deploymentName := getDeploymentName(ctx, pulpBackup)
-	deploymentType := getDeploymentType(ctx, pulpBackup)
 	backupPVC := getBackupPVC(ctx, pulpBackup)
 
 	// we are considering that pulp CR instance is running in the same namespace as pulpbackup and
@@ -183,11 +181,11 @@ func (r *RepoManagerBackupReconciler) createBackupPod(ctx context.Context, pulpB
 	}
 
 	labels := map[string]string{
-		"app.kubernetes.io/name":       deploymentType + "-backup-storage",
-		"app.kubernetes.io/instance":   deploymentType + "-backup-storage-" + pulpBackup.Name,
+		"app.kubernetes.io/name":       "pulp-backup-storage",
+		"app.kubernetes.io/instance":   "pulp-backup-storage-" + pulpBackup.Name,
 		"app.kubernetes.io/component":  "backup-storage",
-		"app.kubernetes.io/part-of":    deploymentType,
-		"app.kubernetes.io/managed-by": deploymentType + "-operator",
+		"app.kubernetes.io/part-of":    "pulp",
+		"app.kubernetes.io/managed-by": "pulp-operator",
 	}
 
 	affinity := &corev1.Affinity{}
@@ -335,7 +333,6 @@ func (r *RepoManagerBackupReconciler) createBackupPVC(ctx context.Context, pulpB
 
 	backupPVC := getBackupPVC(ctx, pulpBackup)
 	backupPVCNamespace := getBackupPVCNamespace(ctx, pulpBackup)
-	deploymentType := getDeploymentType(ctx, pulpBackup)
 
 	var storageClassName string
 	if pulpBackup.Spec.BackupSC != "" {
@@ -350,11 +347,11 @@ func (r *RepoManagerBackupReconciler) createBackupPVC(ctx context.Context, pulpB
 	}
 
 	labels := map[string]string{
-		"app.kubernetes.io/name":       deploymentType + "-backup-storage",
-		"app.kubernetes.io/instance":   deploymentType + "-backup-storage-" + pulpBackup.Name,
+		"app.kubernetes.io/name":       "pulp-backup-storage",
+		"app.kubernetes.io/instance":   "pulp-backup-storage-" + pulpBackup.Name,
 		"app.kubernetes.io/component":  "backup-storage",
-		"app.kubernetes.io/part-of":    deploymentType,
-		"app.kubernetes.io/managed-by": deploymentType + "-operator",
+		"app.kubernetes.io/part-of":    "pulp",
+		"app.kubernetes.io/managed-by": "pulp-operator",
 	}
 
 	// create backup pvc

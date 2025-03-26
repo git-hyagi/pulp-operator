@@ -86,11 +86,11 @@ func (r *RepoManagerRestoreReconciler) createRestorePod(ctx context.Context, pul
 	log := r.RawLogger
 
 	labels := map[string]string{
-		"app.kubernetes.io/name":       pulpRestore.Spec.DeploymentType + "-backup-storage",
-		"app.kubernetes.io/instance":   pulpRestore.Spec.DeploymentType + "-backup-storage-" + pulpRestore.Name,
+		"app.kubernetes.io/name":       "pulp-backup-storage",
+		"app.kubernetes.io/instance":   "pulp-backup-storage-" + pulpRestore.Name,
 		"app.kubernetes.io/component":  "backup-storage",
-		"app.kubernetes.io/part-of":    pulpRestore.Spec.DeploymentType,
-		"app.kubernetes.io/managed-by": pulpRestore.Spec.DeploymentType + "-operator",
+		"app.kubernetes.io/part-of":    "pulp",
+		"app.kubernetes.io/managed-by": "pulp-operator",
 	}
 
 	// [TO-DO] define postgres image based on the database implementation type

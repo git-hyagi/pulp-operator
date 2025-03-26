@@ -24,8 +24,6 @@ import (
 	"github.com/go-logr/logr"
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -99,10 +97,10 @@ func initializeStatusCondition(ctx context.Context, r *RepoManagerReconciler, pu
 	log := r.RawLogger
 
 	// "initialize" operator's .status.condition field
-	if v1.FindStatusCondition(pulp.Status.Conditions, cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType)+"-Operator-Finished-Execution") == nil {
+	if v1.FindStatusCondition(pulp.Status.Conditions, "Pulp-Operator-Finished-Execution") == nil {
 		log.V(1).Info("Creating operator's .status.conditions[] field ...")
 		v1.SetStatusCondition(&pulp.Status.Conditions, metav1.Condition{
-			Type:               cases.Title(language.English, cases.Compact).String(pulp.Spec.DeploymentType) + "-Operator-Finished-Execution",
+			Type:               "Pulp-Operator-Finished-Execution",
 			Status:             metav1.ConditionFalse,
 			Reason:             "OperatorRunning",
 			LastTransitionTime: metav1.Now(),
@@ -148,7 +146,7 @@ func checkIngressDefinition(log logr.Logger, pulp *pulpv1.Pulp) *ctrl.Result {
 		//   "A required string containing the protocol, fqdn, and port where the content app is reachable by users.
 		//   This is used by pulpcore and various plugins when referring users to the content app."
 		if len(pulp.Spec.IngressHost) == 0 {
-			log.Error(nil, "ingress_type defined as ingress but no ingress_host provided. Please, define the ingress_host field with the fqdn where "+pulp.Spec.DeploymentType+" should be accessed. This field is required to access API and also redirect "+pulp.Spec.DeploymentType+" CONTENT requests")
+			log.Error(nil, "ingress_type defined as ingress but no ingress_host provided. Please, define the ingress_host field with the fqdn where Pulp should be accessed. This field is required to access API and also redirect Pulp CONTENT requests")
 			return &ctrl.Result{}
 		}
 	}

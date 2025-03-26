@@ -34,7 +34,7 @@ func (r *RepoManagerRestoreReconciler) restorePulpDir(ctx context.Context, pulpR
 		return err
 	}
 
-	log.Info(pulpRestore.Spec.DeploymentType + "'s directory backup finished!")
+	log.Info("Pulp's directory backup finished!")
 
 	return nil
 }

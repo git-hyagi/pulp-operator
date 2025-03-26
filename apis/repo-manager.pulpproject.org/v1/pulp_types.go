@@ -38,13 +38,6 @@ type PulpSpec struct {
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
 	EnableDebugging bool `json:"enable_debugging,omitempty"`
 
-	// Name of the deployment type.
-	// Default: "pulp"
-	// +kubebuilder:default:="pulp"
-	// +kubebuilder:validation:Enum:=pulp;galaxy
-	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
-	DeploymentType string `json:"deployment_type,omitempty"`
-
 	// The size of the file storage; for example 100Gi.
 	// This field should be used only if file_storage_storage_class is provided
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}

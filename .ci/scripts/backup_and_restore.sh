@@ -10,10 +10,8 @@ PULP_CR=example-pulp
 
 if [[ "$CI_TEST" == "true" ]]; then
   CUSTOM_RESOURCE=simple.yaml
-elif [[ "$CI_TEST" == "galaxy" && "$CI_TEST_STORAGE" == "filesystem" ]]; then
-  CUSTOM_RESOURCE=galaxy.yaml
-elif [[ "$CI_TEST" == "galaxy" && "$CI_TEST_STORAGE" == "azure" ]]; then
-  CUSTOM_RESOURCE=galaxy.azure.ci.yaml
+elif [[ "$CI_TEST_STORAGE" == "azure" ]]; then
+  CUSTOM_RESOURCE=simple.azure.ci.yaml
 elif [[ "$CI_TEST_STORAGE" == "s3" ]]; then
   CUSTOM_RESOURCE=simple.s3.ci.yaml
 fi
@@ -58,7 +56,7 @@ WEB_PORT="24817"
 if [[ "$1" == "--minikube" ]] || [[ "$1" == "-m" ]]; then
   KUBE="minikube"
   SERVER="localhost"
-  if [[ "$CI_TEST" == "true" ]] || [[ "$CI_TEST" == "galaxy" ]]; then
+  if [[ "$CI_TEST" == "true" ]]; then
     services=$(kubectl get services)
     WEB_PORT=$( echo "$services" | awk -F '[ :/]+' '/web-svc/{print $5}')
     SVC_NAME=$( echo "$services" | awk -F '[ :/]+' '/web-svc/{print $1}')
@@ -82,9 +80,6 @@ if [ -z "$(pip freeze | grep pulp-cli)" ]; then
   pip install pulp-cli[pygments]
 fi
 
-if [[ "$CI_TEST" == "galaxy" ]]; then
-  API_ROOT="/api/galaxy/pulp/"
-fi
 API_ROOT=${API_ROOT:-"/pulp/"}
 
 if [ ! -f ~/.config/pulp/settings.toml ]; then

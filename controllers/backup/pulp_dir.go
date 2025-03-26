@@ -13,7 +13,6 @@ import (
 func (r *RepoManagerBackupReconciler) backupPulpDir(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
 	deploymentName := getDeploymentName(ctx, pulpBackup)
-	deploymentType := getDeploymentType(ctx, pulpBackup)
 	backupPod := pulpBackup.Name + "-backup-manager"
 
 	pulp := &pulpv1.Pulp{}
@@ -41,7 +40,7 @@ func (r *RepoManagerBackupReconciler) backupPulpDir(ctx context.Context, pulpBac
 			log.Error(err, "Failed to backup pulp dir")
 			return err
 		}
-		log.Info(deploymentType + "'s directory backup finished!")
+		log.Info("Pulp's directory backup finished!")
 	}
 
 	return nil
