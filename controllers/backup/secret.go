@@ -37,7 +37,7 @@ type secretType struct {
 // backupSecrets makes a copy of the Secrets used by Pulp components
 func (r *RepoManagerBackupReconciler) backupSecret(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
-	deploymentName := getDeploymentName(ctx, pulpBackup)
+	deploymentName := getDeploymentName(pulpBackup)
 
 	// we are considering that pulp CR instance is running in the same namespace as pulpbackup and
 	// that there is only a single instance of pulp CR available
@@ -48,11 +48,11 @@ func (r *RepoManagerBackupReconciler) backupSecret(ctx context.Context, pulpBack
 		return err
 	}
 
-	pulpSecretKey := getPulpSecretKey(ctx, pulpBackup)
-	adminPasswordSecret := getAdminPasswordSecret(ctx, pulpBackup)
-	postgresCfgSecret := getPostgresCfgSecret(ctx, pulpBackup)
-	dbFieldsEncryption := getDBFieldsEncryption(ctx, pulpBackup, pulp)
-	containerTokenSecret := getContainerTokenSecret(ctx, pulpBackup, pulp)
+	pulpSecretKey := getPulpSecretKey(pulpBackup)
+	adminPasswordSecret := getAdminPasswordSecret(pulpBackup)
+	postgresCfgSecret := getPostgresCfgSecret(pulpBackup)
+	dbFieldsEncryption := getDBFieldsEncryption(pulp)
+	containerTokenSecret := getContainerTokenSecret(pulp)
 
 	// PULP-SECRET-KEY
 	if err := r.createSecretBackupFile(ctx, secretType{"pulp_secret_key", pulpBackup, backupDir, "pulp_secret_key.yaml", pulpSecretKey, pod}); err != nil {

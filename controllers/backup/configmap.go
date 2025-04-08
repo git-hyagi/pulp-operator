@@ -37,7 +37,7 @@ type configMapType struct {
 // backupConfigMap makes a copy of the ConfigMaps used by Pulp components
 func (r *RepoManagerBackupReconciler) backupConfigMap(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
-	deploymentName := getDeploymentName(ctx, pulpBackup)
+	deploymentName := getDeploymentName(pulpBackup)
 
 	// we are considering that pulp CR instance is running in the same namespace as pulpbackup and
 	// that there is only a single instance of pulp CR available

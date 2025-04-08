@@ -72,9 +72,9 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		log.Error(err, "Failed to get PulpBackup")
 		return ctrl.Result{}, err
 	}
-	backupDir := getBackupDir(ctx, pulpBackup, formattedCurrentTime)
+	backupDir := getBackupDir(formattedCurrentTime)
 
-	if err := checkRequiredFields(ctx, pulpBackup); err != nil {
+	if err := checkRequiredFields(pulpBackup); err != nil {
 		log.Error(err, "Required field not filled in backup CR!")
 		return ctrl.Result{}, nil
 	}
@@ -96,7 +96,7 @@ func (r *RepoManagerBackupReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		return ctrl.Result{}, err
 	}
 
-	if err = r.createBackupDir(ctx, pulpBackup, backupDir, pod); err != nil {
+	if err = r.createBackupDir(pulpBackup, backupDir, pod); err != nil {
 		r.updateStatus(ctx, pulpBackup, metav1.ConditionFalse, "BackupComplete", "Failed to create backup directory!", "FailedCreateBkpDir")
 		return ctrl.Result{}, err
 	}
@@ -167,8 +167,8 @@ func (r *RepoManagerBackupReconciler) waitPodReady(ctx context.Context, namespac
 func (r *RepoManagerBackupReconciler) createBackupPod(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string) (*corev1.Pod, error) {
 	log := r.RawLogger
 
-	deploymentName := getDeploymentName(ctx, pulpBackup)
-	backupPVC := getBackupPVC(ctx, pulpBackup)
+	deploymentName := getDeploymentName(pulpBackup)
+	backupPVC := getBackupPVC(pulpBackup)
 
 	// we are considering that pulp CR instance is running in the same namespace as pulpbackup and
 	// that there is only a single instance of pulp CR available
@@ -331,8 +331,8 @@ func (r *RepoManagerBackupReconciler) cleanup(ctx context.Context, pulpBackup *p
 func (r *RepoManagerBackupReconciler) createBackupPVC(ctx context.Context, pulpBackup *pulpv1.PulpBackup) error {
 	log := r.RawLogger
 
-	backupPVC := getBackupPVC(ctx, pulpBackup)
-	backupPVCNamespace := getBackupPVCNamespace(ctx, pulpBackup)
+	backupPVC := getBackupPVC(pulpBackup)
+	backupPVCNamespace := getBackupPVCNamespace(pulpBackup)
 
 	var storageClassName string
 	if pulpBackup.Spec.BackupSC != "" {

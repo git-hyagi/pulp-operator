@@ -20,15 +20,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"github.com/pulp/pulp-operator/controllers/settings"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -478,51 +475,6 @@ func allowedContentChecksumsSettings(resources controllers.FunctionResources, pu
 	}
 	settings, _ := json.Marshal(pulp.Spec.AllowedContentChecksums)
 	*pulpSettings = *pulpSettings + fmt.Sprintln("ALLOWED_CONTENT_CHECKSUMS = ", string(settings))
-}
-
-func convertSettings(key string, settings interface{}) string {
-	var converted string
-	switch s := settings.(type) {
-
-	case map[string]interface{}:
-		var settingsJson map[string]interface{}
-		settingsMarshalled, _ := json.Marshal(s)
-		json.Unmarshal(settingsMarshalled, &settingsJson)
-
-		sortedKeys := sortKeys(settingsJson)
-		converted = converted + fmt.Sprintf("%v = {\n", strings.ToUpper(key))
-		for _, k := range sortedKeys {
-			rc, _ := regexp.Compile(`(?s)(.*) = (.*)\n`)
-			rp := rc.ReplaceAllString(convertSettings(k, settingsJson[k]), `'$1': $2`)
-			converted = converted + fmt.Sprintf("  %v,\n", rp)
-		}
-		converted = fmt.Sprintf("%v}\n", converted)
-	case []interface{}:
-		converted = fmt.Sprintf("%v = [\n", strings.ToUpper(key))
-		for i := range s {
-			rc, _ := regexp.Compile(`(?s)(.*) = (.*)\n`)
-			rp := rc.ReplaceAllString(convertSettings(key, s[i]), `$2`)
-			converted = converted + fmt.Sprintf("  %v,\n", rp)
-		}
-		converted = fmt.Sprintf("%v]\n", converted)
-	case bool:
-		// Pulp expects True or False, but golang boolean values are true or false
-		// so we are converting to string and changing to capital T or F
-		convertToString := cases.Title(language.English, cases.Compact).String(strconv.FormatBool(s))
-		converted = converted + fmt.Sprintf("%v = %v\n", strings.ToUpper(key), convertToString)
-	case float32, float64:
-		converted = converted + fmt.Sprintf("%v = %v\n", strings.ToUpper(key), s)
-	default:
-		// if it is a tuple, we should not parse it as a string (do not add the quotes)
-		r, _ := regexp.Compile(`\(.*\)`)
-		if r.MatchString(s.(string)) {
-			converted = converted + fmt.Sprintf("%v = %v\n", strings.ToUpper(key), s)
-		} else {
-			converted = converted + fmt.Sprintf("%v = \"%v\"\n", strings.ToUpper(key), s)
-		}
-	}
-
-	return converted
 }
 
 func addCustomPulpSettings(resources controllers.FunctionResources, pulpSettings *string) {

@@ -13,7 +13,7 @@ import (
 func (r *RepoManagerBackupReconciler) backupDatabase(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
 	backupFile := "pulp.db"
-	postgresConfigurationSecret := getPostgresCfgSecret(ctx, pulpBackup)
+	postgresConfigurationSecret := getPostgresCfgSecret(pulpBackup)
 	backupPod := pulpBackup.Name + "-backup-manager"
 
 	log.Info("Starting database backup process ...")

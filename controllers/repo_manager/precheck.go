@@ -75,7 +75,7 @@ func prechecks(ctx context.Context, r *RepoManagerReconciler, pulp *pulpv1.Pulp)
 	}
 
 	// verify inconsistency in allowed_content_checksums definition
-	if reconcile := checkAllowedContentChecksums(ctx, r, pulp); reconcile != nil {
+	if reconcile := checkAllowedContentChecksums(pulp); reconcile != nil {
 		return reconcile, nil
 	}
 
@@ -85,7 +85,7 @@ func prechecks(ctx context.Context, r *RepoManagerReconciler, pulp *pulpv1.Pulp)
 	}
 
 	// verify the metadata signing definitions
-	if reconcile := checkSigningScripts(ctx, r, pulp); reconcile != nil {
+	if reconcile := checkSigningScripts(r, pulp); reconcile != nil {
 		return reconcile, nil
 	}
 
@@ -256,7 +256,7 @@ func hasFileStorageDefinition(pulp *pulpv1.Pulp) bool {
 // * deprecated checksums algorithms
 // * mandatory checksums present (for now, only sha256 is required)
 // * checksums provided are valid
-func checkAllowedContentChecksums(ctx context.Context, r *RepoManagerReconciler, pulp *pulpv1.Pulp) *ctrl.Result {
+func checkAllowedContentChecksums(pulp *pulpv1.Pulp) *ctrl.Result {
 	logger := controllers.CustomZapLogger()
 
 	if len(pulp.Spec.AllowedContentChecksums) == 0 {
@@ -317,7 +317,7 @@ func checkLDAPCA(ctx context.Context, r *RepoManagerReconciler, pulp *pulpv1.Pul
 }
 
 // checkSigningScripts verifies if signing_script and/or signing_secret is/are defined
-func checkSigningScripts(ctx context.Context, r *RepoManagerReconciler, pulp *pulpv1.Pulp) *ctrl.Result {
+func checkSigningScripts(r *RepoManagerReconciler, pulp *pulpv1.Pulp) *ctrl.Result {
 	if len(pulp.Spec.SigningScripts) > 0 && len(pulp.Spec.SigningSecret) == 0 {
 		r.RawLogger.Error(nil, "spec.signing_scripts is defined but spec.signing_secret was not found! Provide both values or none to avoid error in Pulp execution.")
 		return &ctrl.Result{}

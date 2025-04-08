@@ -12,7 +12,7 @@ import (
 // backupPulpDir copies the content of /var/lib/pulp into the backup PVC
 func (r *RepoManagerBackupReconciler) backupPulpDir(ctx context.Context, pulpBackup *pulpv1.PulpBackup, backupDir string, pod *corev1.Pod) error {
 	log := r.RawLogger
-	deploymentName := getDeploymentName(ctx, pulpBackup)
+	deploymentName := getDeploymentName(pulpBackup)
 	backupPod := pulpBackup.Name + "-backup-manager"
 
 	pulp := &pulpv1.Pulp{}

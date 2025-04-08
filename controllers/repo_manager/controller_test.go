@@ -14,7 +14,6 @@ import (
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -1232,19 +1231,6 @@ exec "${PULP_CONTENT_ENTRYPOINT[@]}" \
 	})
 
 })
-
-// isDefaultSCDefined returns true if found a StorageClass marked as default
-func isDefaultSCDefined() bool {
-	scList := &storagev1.StorageClassList{}
-	k8sClient.List(ctx, scList)
-	for _, sc := range scList.Items {
-		annotation := sc.ObjectMeta.GetAnnotations()
-		if _, found := annotation["storageclass.kubernetes.io/is-default-class"]; found {
-			return true
-		}
-	}
-	return false
-}
 
 // objectUpdate waits and retries until an update request returns without error.
 // a common cause that it is needed is because sometimes the object has been modified

@@ -34,7 +34,7 @@ import (
 
 func (r *RepoManagerReconciler) CreateServiceAccount(ctx context.Context, pulp *pulpv1.Pulp) (ctrl.Result, error) {
 	log := r.RawLogger
-	conditionType := getApiConditionType(pulp)
+	conditionType := getApiConditionType()
 
 	serviceAccountName := settings.PulpServiceAccount(pulp.Name)
 	sa := &corev1.ServiceAccount{}
@@ -81,7 +81,7 @@ func (r *RepoManagerReconciler) CreateServiceAccount(ctx context.Context, pulp *
 
 func (r *RepoManagerReconciler) CreateRole(ctx context.Context, pulp *pulpv1.Pulp) (ctrl.Result, error) {
 	log := r.RawLogger
-	conditionType := getApiConditionType(pulp)
+	conditionType := getApiConditionType()
 	role := &rbacv1.Role{}
 	err := r.Get(ctx, types.NamespacedName{Name: pulp.Name, Namespace: pulp.Namespace}, role)
 	expectedRole := r.pulpRole(pulp)
@@ -107,7 +107,7 @@ func (r *RepoManagerReconciler) CreateRole(ctx context.Context, pulp *pulpv1.Pul
 
 func (r *RepoManagerReconciler) CreateRoleBinding(ctx context.Context, pulp *pulpv1.Pulp) (ctrl.Result, error) {
 	log := r.RawLogger
-	conditionType := getApiConditionType(pulp)
+	conditionType := getApiConditionType()
 	rolebinding := &rbacv1.RoleBinding{}
 	err := r.Get(ctx, types.NamespacedName{Name: pulp.Name, Namespace: pulp.Namespace}, rolebinding)
 	expectedRoleBinding := r.pulpRoleBinding(pulp)
@@ -232,7 +232,7 @@ func (r *RepoManagerReconciler) pulpRoleBinding(m *pulpv1.Pulp) *rbacv1.RoleBind
 }
 
 // getConditionType returns a string with the .status.conditions.type from API resource
-func getApiConditionType(m *pulpv1.Pulp) string {
+func getApiConditionType() string {
 	return "Pulp-API-Ready"
 }
 

@@ -262,8 +262,3 @@ func (r *RepoManagerRestoreReconciler) getBackupDir(ctx context.Context, pulpRes
 	}
 	return backupDir, nil
 }
-
-// getDeploymentName returns the deployment_name
-func getDeploymentName(ctx context.Context, pulpRestore *pulpv1.PulpRestore) string {
-	return pulpRestore.Spec.DeploymentName
-}
