@@ -32,7 +32,6 @@ NAME   AGE
 pulp   3m30s
 ```
 
-* the type of deployment (`deployment_type`), in this case `pulp` (but could also be `galaxy` depending on the installation).
 * the name of `StorageClass` used to provision the `PVC` to store the backup data (`backup_storage_class`).
 * the name of the `Secret` with Pulp admin password (`admin_password_secret`), which can be get by:
 ```
