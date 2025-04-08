@@ -74,52 +74,72 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Setup Go environment
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
           cache: false
       - name: Install kind
-        run: |
-          .ci/scripts/kind_with_registry.sh v1.31.6
-        shell: bash
+        run: .ci/scripts/kind_with_registry.sh v1.31.6
       - name: Install OLM
         run: |
           make sdkbin OPERATOR_SDK_VERSION=v1.31.0 LOCALBIN=/tmp
           /tmp/operator-sdk olm install --version v0.31.0
         shell: bash
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install Pulp CRD
-        run: |
-          make install
-        shell: bash
+        run: make install
       - name: Build operator image
-        run: |
-          make docker-build docker-push IMG=localhost:5001/pulp-operator:dev
+        run: make docker-build docker-push IMG=localhost:5001/pulp-operator:dev
       - name: Build bundle image
-        run: |
-          make bundle bundle-build bundle-push BUNDLE_IMG=localhost:5001/pulp-operator-bundle:testing IMG=localhost:5001/pulp-operator:dev
-        shell: bash
+        run: make bundle bundle-build bundle-push BUNDLE_IMG=localhost:5001/pulp-operator-bundle:testing IMG=localhost:5001/pulp-operator:dev
       - name: Install the operator
-        run: |
-          /tmp/operator-sdk run bundle --skip-tls localhost:5001/pulp-operator-bundle:testing --timeout 300s
-        shell: bash
+        run: /tmp/operator-sdk run bundle --skip-tls localhost:5001/pulp-operator-bundle:testing
       - name: Deploy example-pulp and test-pulp
         run: |
           kubectl apply -f config/samples/simple-with-reduced-migration-cpu.yaml
           kubectl apply -f config/samples/simple-test.yaml
       - name: Check and wait for example-pulp deployment
         run: kubectl wait --for condition=Pulp-Operator-Finished-Execution pulp/example-pulp --timeout=600s
-        shell: bash
       - name: Check and wait for test-pulp deployment
         run: kubectl wait --for condition=Pulp-Operator-Finished-Execution pulp/test-pulp --timeout=600s
       - name: Logs
         if: always()
         run: .github/workflows/scripts/show_logs.sh --kind
+      - name: OLM Logs
+        if: always()
+        run: |
+          echo ::group::SUB
+          kubectl get sub -oyaml -A
+          echo ::endgroup::
+
+          echo ::group::InstallPlan
+          kubectl get ip -A -oyaml
+          echo ::endgroup::
+
+          echo ::group::PODS
+          kubectl -nolm get pods
+          kubectl get pods -A
+          echo ::endgroup::
+
+          echo ::group::CATALOG-OPERATOR-LOGS
+          kubectl -nolm logs deployment/catalog-operator
+          echo ::endgroup::
+
+          echo ::group::OLM-OPERATOR-LOGS
+          kubectl -nolm logs deployment/olm-operator
+          echo ::endgroup::
+
+          echo ::group::CATALOGSOURCE
+          kubectl get catalogsource -oyaml -A 
+          echo ::endgroup::
+
+          echo ::group::CATALOGSOURCE-POD-LOGS
+          kubectl -ndefault logs localhost-5001-pulp-operator-bundle-testing
+          kubectl -ndefault describe pod/localhost-5001-pulp-operator-bundle-testing
+          echo ::endgroup::
+        shell: bash
+
   envtest:
     runs-on: ubuntu-latest
     steps:
