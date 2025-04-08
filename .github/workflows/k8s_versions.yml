@@ -1,7 +1,5 @@
 name: Kubernetes Versions
 on:
-#  push:
-#    branches: [ '*' ]
   workflow_dispatch:
   pull_request:
     branches: [ main ]
@@ -15,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - K8S_VERSION: v1.29.0
-          - K8S_VERSION: v1.28.4
-          - K8S_VERSION: v1.27.8
+          - K8S_VERSION: v1.32.0
+          - K8S_VERSION: v1.31.0
+          - K8S_VERSION: v1.30.4
     steps:
       - uses: actions/checkout@v4
       - uses: "./.github/actions/pre-reqs"
@@ -54,9 +52,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - K8S_VERSION: v1.29.0
-          - K8S_VERSION: v1.28.0
-          - K8S_VERSION: v1.27.0
+          - K8S_VERSION: v1.32.2
+          - K8S_VERSION: v1.31.6
+          - K8S_VERSION: v1.30.10
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.8
@@ -110,14 +108,6 @@ jobs:
           kubectl version -ojson|jq .serverVersion
           kubectl wait --for=condition=Ready node/kind-control-plane
         shell: bash
-      - name: Uninstalling GHA kustomize
-        run: |
-          # hack for uninstalling kustomize from GHA
-          mv /usr/local/bin/kustomize /usr/local/bin/ghakustomize
-          make kustomize
-          mv ./bin/kustomize /usr/local/bin/kustomize
-          kustomize version
-        shell: bash
       - name: Check code format and generate manifests
         run: |
           make manifests generate fmt vet
@@ -158,9 +148,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          #- K8S_VERSION: 1.29
-          - K8S_VERSION: 1.28
-          - K8S_VERSION: 1.27
+          - K8S_VERSION: 1.32
+          - K8S_VERSION: 1.31
+          - K8S_VERSION: "1.30"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.8
@@ -206,14 +196,6 @@ jobs:
             " | sudo tee -a /etc/containers/registries.conf
           fi
         shell: bash
-      - name: Uninstalling GHA kustomize
-        run: |
-          # hack for uninstalling kustomize from GHA
-          mv /usr/local/bin/kustomize /usr/local/bin/ghakustomize
-          make kustomize
-          mv ./bin/kustomize /usr/local/bin/kustomize
-          kustomize version
-        shell: bash
       - name: Install eksctl
         run: |
           curl "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" --silent --location | tar xz -C /tmp
@@ -227,7 +209,7 @@ jobs:
         shell: bash
       - name: Install eksctl-anywhere
         run: |
-          RELEASE_VERSION=v0.18.3
+          RELEASE_VERSION=$(curl https://anywhere-assets.eks.amazonaws.com/releases/eks-a/manifest.yaml --silent --location | yq ".spec.latestVersion")
           EKS_ANYWHERE_TARBALL_URL=$(curl https://anywhere-assets.eks.amazonaws.com/releases/eks-a/manifest.yaml --silent --location | yq ".spec.releases[] | select(.version==\"$RELEASE_VERSION\").eksABinary.$(uname -s | tr A-Z a-z).uri")
           curl $EKS_ANYWHERE_TARBALL_URL --silent --location | tar xz ./eksctl-anywhere
           sudo install -m 0755 ./eksctl-anywhere /usr/local/bin/eksctl-anywhere
