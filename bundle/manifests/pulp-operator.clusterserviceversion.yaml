@@ -64,11 +64,11 @@ metadata:
     capabilities: Full Lifecycle
     categories: Integration & Delivery
     containerImage: quay.io/pulp/pulp-operator:devel
-    createdAt: "2025-04-08T19:30:00Z"
+    createdAt: "2025-04-08T20:22:53Z"
     description: Pulp is a platform for managing repositories of software packages
       and making them available to a large number of consumers.
     metadata.annotations.support: Community
-    operators.operatorframework.io/builder: operator-sdk-v1.29.0
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/pulp/pulp-operator
   name: pulp-operator.v1.0.0

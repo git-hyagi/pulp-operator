@@ -106,7 +106,7 @@ jobs:
         shell: bash
       - name: Install the operator
         run: |
-          /tmp/operator-sdk run bundle --skip-tls localhost:5001/pulp-operator-bundle:testing
+          /tmp/operator-sdk run bundle --skip-tls localhost:5001/pulp-operator-bundle:testing --timeout 300s
         shell: bash
       - name: Deploy example-pulp and test-pulp
         run: |
