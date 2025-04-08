@@ -55,9 +55,8 @@ metadata:
           "spec": {
             "admin_password_secret": "example-pulp-admin-password",
             "backup_storage_class": "standard",
-            "deployment_name": "galaxy-example",
-            "deployment_type": "galaxy",
-            "postgres_configuration_secret": "galaxy-example-postgres-configuration"
+            "deployment_name": "pulp-example",
+            "postgres_configuration_secret": "pulp-example-postgres-configuration"
           }
         },
         {
@@ -68,7 +67,7 @@ metadata:
           },
           "spec": {
             "backup_name": "pulpbackup-sample",
-            "deployment_name": "galaxy-example"
+            "deployment_name": "pulp-example"
           }
         }
       ]
@@ -80,6 +79,7 @@ metadata:
       and making them available to a large number of consumers.
     operators.operatorframework.io/builder: operator-sdk-v1.22.2
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    metadata.annotations.support: Community
     repository: https://github.com/pulp/pulp-operator
   name: pulp-operator.v1.0.0
   namespace: placeholder
@@ -1436,4 +1436,5 @@ spec:
     name: pulp-redis
   - image: docker.io/library/postgres:13
     name: pulp-postgres
+  minKubeVersion: v1.30
   version: 1.0.0
