@@ -83,12 +83,12 @@ jobs:
           cache: false
       - name: Install kind
         run: |
-          .ci/scripts/kind_with_registry.sh v1.32.2
+          .ci/scripts/kind_with_registry.sh v1.31.6
         shell: bash
       - name: Install OLM
         run: |
-          make sdkbin OPERATOR_SDK_VERSION=v1.29.0 LOCALBIN=/tmp
-          /tmp/operator-sdk olm install
+          make sdkbin OPERATOR_SDK_VERSION=v1.31.0 LOCALBIN=/tmp
+          /tmp/operator-sdk olm install --version v0.31.0
         shell: bash
       - uses: actions/checkout@v4
         with:
@@ -186,7 +186,6 @@ jobs:
           make docker-build deploy
           kubectl get namespace
           kubectl config set-context --current --namespace=pulp-operator-system
-          kubectl apply -f .ci/assets/kubernetes/pulp-admin-password.secret.yaml
           kubectl apply -f config/samples/simple.yaml
         shell: bash
       - name: Check and wait pulp-operator deploy

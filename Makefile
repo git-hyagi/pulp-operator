@@ -283,7 +283,7 @@ SDK_BIN = $(LOCALBIN)/operator-sdk
 KUSTOMIZE_VERSION ?= v3.8.7
 CONTROLLER_TOOLS_VERSION ?= v0.16.5
 CRD_MARKDOWN_VERSION ?= v0.0.3
-OPERATOR_SDK_VERSION ?= v1.29.0
+OPERATOR_SDK_VERSION ?= v1.31.0
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
