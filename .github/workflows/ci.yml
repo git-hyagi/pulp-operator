@@ -83,7 +83,7 @@ jobs:
           cache: false
       - name: Install kind
         run: |
-          .ci/scripts/kind_with_registry.sh
+          .ci/scripts/kind_with_registry.sh v1.32.2
         shell: bash
       - name: Install OLM
         run: |

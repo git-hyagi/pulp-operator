@@ -231,11 +231,17 @@ func (d *CommonDeployment) setEnvVars(resources any, pulpcoreType settings.Pulpc
 	envVars := SetPulpcoreCustomEnvVars(*pulp, pulpcoreType)
 
 	if pulpcoreType != settings.WORKER {
-		// gunicornWorkers definition
+		// get gunicornWorkers definition from CR
 		gunicornWorkers := strconv.FormatInt(pulpcoreTypeField.FieldByName("GunicornWorkers").Int(), 10)
+		if gunicornWorkers == "0" { // set default value if none provided
+			gunicornWorkers = "2"
+		}
 
-		// gunicornTimeout definition
+		// get gunicornTimeout definition from CR
 		gunicornTimeout := strconv.FormatInt(pulpcoreTypeField.FieldByName("GunicornTimeout").Int(), 10)
+		if gunicornTimeout == "0" { // set default value if none provided
+			gunicornTimeout = "90"
+		}
 
 		gunicornEnvVars := []corev1.EnvVar{
 			{Name: "PULP_GUNICORN_TIMEOUT", Value: gunicornTimeout},

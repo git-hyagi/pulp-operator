@@ -247,12 +247,12 @@ type PulpSpec struct {
 	Database Database `json:"database,omitempty"`
 
 	// Content defines desired state of pulpcore-content resources
-	//+kubebuilder:validation:Optional
+	// +kubebuilder:default:={replicas:1}
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Content Content `json:"content,omitempty"`
 
 	// Worker defines desired state of pulpcore-worker resources
-	//+kubebuilder:validation:Optional
+	// +kubebuilder:default:={replicas:1}
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Worker Worker `json:"worker,omitempty"`
 
@@ -316,7 +316,6 @@ type PulpSpec struct {
 	// Define if the operator should or should not mount the custom CA certificates added to the cluster via cluster-wide proxy config.
 	// Default: false
 	// +kubebuilder:validation:Optional
-	// +kubebuilder:default:=false
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
 	TrustedCa bool `json:"mount_trusted_ca,omitempty"`
 
@@ -418,14 +417,12 @@ type Api struct {
 
 	// The timeout for the gunicorn process.
 	// Default: 90
-	// +kubebuilder:default:=90
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:number","urn:alm:descriptor:com.tectonic.ui:advanced"}
 	GunicornTimeout int `json:"gunicorn_timeout,omitempty"`
 
 	// The number of gunicorn workers to use for the api.
 	// Default: 2
-	// +kubebuilder:default:=2
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:number","urn:alm:descriptor:com.tectonic.ui:advanced"}
 	GunicornWorkers int `json:"gunicorn_workers,omitempty"`
@@ -448,16 +445,16 @@ type Api struct {
 	LivenessProbe *corev1.Probe `json:"livenessProbe,omitempty"`
 
 	// PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods
-	// +optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
 	PDB *policy.PodDisruptionBudgetSpec `json:"pdb,omitempty"`
 
 	// The deployment strategy to use to replace existing pods with new ones.
-	// +optional
+	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:updateStrategy","urn:alm:descriptor:com.tectonic.ui:advanced"}
 	Strategy appsv1.DeploymentStrategy `json:"strategy,omitempty"`
 
 	// InitContainer defines configuration of the init-containers that run in pulpcore pods
+	// +kubebuilder:validation:Optional
 	InitContainer PulpContainer `json:"init_container,omitempty"`
 
 	// Environment variables to add to pulpcore-api container
@@ -472,8 +469,8 @@ type Api struct {
 // Content defines desired state of pulpcore-content resources
 type Content struct {
 	// Size is the size of number of pulp-content replicas.
-	// Default: 2
-	// +kubebuilder:default:=2
+	// Default: 1
+	// +kubebuilder:default:=1
 	// +kubebuilder:validation:Minimum:=0
 	// +kubebuilder:validation:Optional
 	// +nullable
@@ -481,6 +478,7 @@ type Content struct {
 	Replicas int32 `json:"replicas"`
 
 	// Resource requirements for the pulp-content container
+	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:resourceRequirements","urn:alm:descriptor:com.tectonic.ui:advanced"}
 	ResourceRequirements corev1.ResourceRequirements `json:"resource_requirements,omitempty"`
 
@@ -506,14 +504,12 @@ type Content struct {
 
 	// The timeout for the gunicorn process.
 	// Default: 90
-	// +kubebuilder:default:=90
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:number","urn:alm:descriptor:com.tectonic.ui:advanced"}
 	GunicornTimeout int `json:"gunicorn_timeout,omitempty"`
 
 	// The number of gunicorn workers to use for the api.
 	// Default: 2
-	// +kubebuilder:default:=2
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:number","urn:alm:descriptor:com.tectonic.ui:advanced"}
 	GunicornWorkers int `json:"gunicorn_workers,omitempty"`
@@ -531,19 +527,21 @@ type Content struct {
 	LivenessProbe *corev1.Probe `json:"livenessProbe,omitempty"`
 
 	// PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods
-	// +optional
+	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
 	PDB *policy.PodDisruptionBudgetSpec `json:"pdb,omitempty"`
 
 	// The deployment strategy to use to replace existing pods with new ones.
-	// +optional
+	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:updateStrategy","urn:alm:descriptor:com.tectonic.ui:advanced"}
 	Strategy appsv1.DeploymentStrategy `json:"strategy,omitempty"`
 
 	// InitContainer defines configuration of the init-containers that run in pulpcore pods
+	// +kubebuilder:validation:Optional
 	InitContainer PulpContainer `json:"init_container,omitempty"`
 
 	// Environment variables to add to pulpcore-content container
+	// +kubebuilder:validation:Optional
 	EnvVars []corev1.EnvVar `json:"env_vars,omitempty"`
 
 	// Annotations for the content deployment
@@ -555,8 +553,8 @@ type Content struct {
 // Worker defines desired state of pulpcore-worker resources
 type Worker struct {
 	// Size is the size of number of pulp-worker replicas.
-	// Default: 2
-	// +kubebuilder:default:=2
+	// Default: 1
+	// +kubebuilder:default:=1
 	// +kubebuilder:validation:Minimum:=0
 	// +kubebuilder:validation:Optional
 	// +nullable

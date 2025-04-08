@@ -72,7 +72,7 @@ Content defines desired state of pulpcore-content resources
 
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
-| replicas | Size is the size of number of pulp-content replicas. Default: 2 | int32 | true |
+| replicas | Size is the size of number of pulp-content replicas. Default: 1 | int32 | true |
 | resource_requirements | Resource requirements for the pulp-content container | corev1.ResourceRequirements | false |
 | affinity | Affinity is a group of affinity scheduling rules. | *corev1.Affinity | false |
 | node_selector | NodeSelector for the Pulp pods. | map[string]string | false |
@@ -310,7 +310,7 @@ Worker defines desired state of pulpcore-worker resources
 
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
-| replicas | Size is the size of number of pulp-worker replicas. Default: 2 | int32 | true |
+| replicas | Size is the size of number of pulp-worker replicas. Default: 1 | int32 | true |
 | resource_requirements | Resource requirements for the pulp-api container | corev1.ResourceRequirements | false |
 | affinity | Affinity is a group of affinity scheduling rules. | *corev1.Affinity | false |
 | node_selector | NodeSelector for the Pulp pods. | map[string]string | false |

@@ -1303,13 +1303,11 @@ spec:
                       type: object
                     type: array
                   gunicorn_timeout:
-                    default: 90
                     description: |-
                       The timeout for the gunicorn process.
                       Default: 90
                     type: integer
                   gunicorn_workers:
-                    default: 2
                     description: |-
                       The number of gunicorn workers to use for the api.
                       Default: 2
@@ -3689,6 +3687,8 @@ spec:
                   Default: <operator's name> + "-container-auth"
                 type: string
               content:
+                default:
+                  replicas: 1
                 description: Content defines desired state of pulpcore-content resources
                 properties:
                   affinity:
@@ -4745,13 +4745,11 @@ spec:
                       type: object
                     type: array
                   gunicorn_timeout:
-                    default: 90
                     description: |-
                       The timeout for the gunicorn process.
                       Default: 90
                     type: integer
                   gunicorn_workers:
-                    default: 2
                     description: |-
                       The number of gunicorn workers to use for the api.
                       Default: 2
@@ -5361,10 +5359,10 @@ spec:
                         type: integer
                     type: object
                   replicas:
-                    default: 2
+                    default: 1
                     description: |-
                       Size is the size of number of pulp-content replicas.
-                      Default: 2
+                      Default: 1
                     format: int32
                     minimum: 0
                     nullable: true
@@ -7446,7 +7444,6 @@ spec:
                     type: object
                 type: object
               mount_trusted_ca:
-                default: false
                 description: |-
                   Define if the operator should or should not mount the custom CA certificates added to the cluster via cluster-wide proxy config.
                   Default: false
@@ -8499,6 +8496,8 @@ spec:
                     type: string
                 type: object
               worker:
+                default:
+                  replicas: 1
                 description: Worker defines desired state of pulpcore-worker resources
                 properties:
                   affinity:
@@ -10158,10 +10157,10 @@ spec:
                         type: integer
                     type: object
                   replicas:
-                    default: 2
+                    default: 1
                     description: |-
                       Size is the size of number of pulp-worker replicas.
-                      Default: 2
+                      Default: 1
                     format: int32
                     minimum: 0
                     nullable: true
