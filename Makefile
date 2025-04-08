@@ -10,10 +10,12 @@ WEB_IMAGE ?= quay.io/pulp/pulp-web
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 1.0.0-beta.5
+VERSION ?= 1.0.0
+DATE := $(shell date '+%Y%m%d')
+BUILD_VERSION := $(VERSION)-$(DATE)
 
 # CHANNELS define the bundle channels used in the bundle.
-CHANNELS = "beta"
+CHANNELS = "stable"
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
 # To re-generate a bundle for other specific channels without changing the standard setup, you can:
 # - use the CHANNELS as arg of the bundle target (e.g make bundle CHANNELS=candidate,fast,stable)
@@ -24,7 +26,7 @@ endif
 
 # DEFAULT_CHANNEL defines the default channel used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g DEFAULT_CHANNEL = "stable")
-DEFAULT_CHANNEL = "beta"
+DEFAULT_CHANNEL = "stable"
 # To re-generate a bundle for any other default channel without changing the default setup, you can:
 # - use the DEFAULT_CHANNEL as arg of the bundle target (e.g make bundle DEFAULT_CHANNEL=stable)
 # - use environment variables to overwrite this value (e.g export DEFAULT_CHANNEL="stable")
@@ -64,7 +66,7 @@ WATCH_NAMESPACE ?= $(NAMESPACE)
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.24.2
 
-GOLANG_VERSION=1.20.10
+GOLANG_VERSION=1.23.0
 GOLANG_ARCH=linux-amd64
 GOLANG_INSTALL_PATH=/tmp
 
@@ -167,44 +169,44 @@ servedocs: ## Build unified docs
 
 .PHONY: build
 build: generate fmt vet ## Build manager binary.
-	go build -o bin/manager main.go
+	go build -o bin/manager -ldflags="-X 'main.Version=$(BUILD_VERSION)'" main.go
 
-.PHONY: rename
-rename: ## Replace Custom Resource name
-	find apis/repo-manager.pulpproject.org/v1/*_types.go -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
-	find controllers/*.go -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
-	find controllers/*/*.go -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
-	find config/samples/*.yaml -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
-	sed -i "s/Pulp/${CR_KIND}/g" PROJECT
-	sed -i "s/pulpproject.org/${CR_DOMAIN}/g" PROJECT main.go
-	find apis/repo-manager.pulpproject.org/v1/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
-	find bundle/manifests/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
-	find config/*/* -exec sed -i "s/pulps/${CR_PLURAL}/g" {} \;
-	find config/*/* -exec sed -i "s/pulprestores/${LOWER_CR_KIND}restores/g" {} \;
-	find config/*/* -exec sed -i "s/pulpbackups/${LOWER_CR_KIND}backups/g" {} \;
-	sed -i "s/pulp/${LOWER_CR_KIND}/g" config/default/kustomization.yaml
-	find config/*/* -exec sed -i "s/3b5210cd.pulpproject.org/3b5210cd.${CR_DOMAIN}/g" {} \;
-	find config/*/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
-	find controllers/*/*.go -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
-	find controllers/*.go -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
-	find controllers/*/*.go -exec sed -i "s/pulps/${CR_PLURAL}/g" {} \;
-	find controllers/*.go -exec sed -i "s/pulps/${CR_PLURAL}/g" {} \;
-	find controllers/*/*.go -exec sed -i "s/pulpbackup/${LOWER_CR_KIND}backup/g" {} \;
-	find controllers/*/*.go -exec sed -i "s/pulprestore/${LOWER_CR_KIND}restore/g" {} \;
-	sed -i "s/default:=\"pulp\"/default:=\"${LOWER_CR_KIND}\"/" apis/repo-manager.pulpproject.org/v1/pulp_types.go
-	sed -i "s|quay.io/pulp/pulp-minimal|${APP_IMAGE}|g" apis/repo-manager.pulpproject.org/v1/pulp_types.go
-	sed -i "s|quay.io/pulp/pulp-web|${WEB_IMAGE}|g" apis/repo-manager.pulpproject.org/v1/pulp_types.go
-	sed -i '0,/OperatorType/s/OperatorType.*/OperatorType  = "${LOWER_CR_KIND}"/' controllers/repo_manager/controller_test.go
-	sed -i "s|quay.io/pulp/pulp-minimal|${APP_IMAGE}|g" controllers/repo_manager/controller_test.go
-	mv config/crd/bases/repo-manager.pulpproject.org_pulps.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${CR_PLURAL}.yaml
-	mv config/crd/bases/repo-manager.pulpproject.org_pulpbackups.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}backups.yaml
-	mv config/crd/bases/repo-manager.pulpproject.org_pulprestores.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}restores.yaml
-	mv bundle/manifests/repo-manager.pulpproject.org_pulps.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${CR_PLURAL}.yaml
-	mv bundle/manifests/repo-manager.pulpproject.org_pulpbackups.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}backups.yaml
-	mv bundle/manifests/repo-manager.pulpproject.org_pulprestores.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}restores.yaml
-	mv apis/repo-manager.pulpproject.org apis/repo-manager.${CR_DOMAIN}
-	sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" controllers/utils.go
-	mv config/samples/repo-manager.pulpproject.org_v1_pulp.yaml config/samples/repo-manager.${CR_DOMAIN}_v1_pulp.yaml
+#.PHONY: rename
+#rename: ## Replace Custom Resource name
+#	find apis/repo-manager.pulpproject.org/v1/*_types.go -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
+#	find controllers/*.go -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
+#	find controllers/*/*.go -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
+#	find config/samples/*.yaml -exec sed -i "s/Pulp/${CR_KIND}/g" {} \;
+#	sed -i "s/Pulp/${CR_KIND}/g" PROJECT
+#	sed -i "s/pulpproject.org/${CR_DOMAIN}/g" PROJECT main.go
+#	find apis/repo-manager.pulpproject.org/v1/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
+#	find bundle/manifests/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
+#	find config/*/* -exec sed -i "s/pulps/${CR_PLURAL}/g" {} \;
+#	find config/*/* -exec sed -i "s/pulprestores/${LOWER_CR_KIND}restores/g" {} \;
+#	find config/*/* -exec sed -i "s/pulpbackups/${LOWER_CR_KIND}backups/g" {} \;
+#	sed -i "s/pulp/${LOWER_CR_KIND}/g" config/default/kustomization.yaml
+#	find config/*/* -exec sed -i "s/3b5210cd.pulpproject.org/3b5210cd.${CR_DOMAIN}/g" {} \;
+#	find config/*/* -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
+#	find controllers/*/*.go -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
+#	find controllers/*.go -exec sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" {} \;
+#	find controllers/*/*.go -exec sed -i "s/pulps/${CR_PLURAL}/g" {} \;
+#	find controllers/*.go -exec sed -i "s/pulps/${CR_PLURAL}/g" {} \;
+#	find controllers/*/*.go -exec sed -i "s/pulpbackup/${LOWER_CR_KIND}backup/g" {} \;
+#	find controllers/*/*.go -exec sed -i "s/pulprestore/${LOWER_CR_KIND}restore/g" {} \;
+#	sed -i "s/default:=\"pulp\"/default:=\"${LOWER_CR_KIND}\"/" apis/repo-manager.pulpproject.org/v1/pulp_types.go
+#	sed -i "s|quay.io/pulp/pulp-minimal|${APP_IMAGE}|g" apis/repo-manager.pulpproject.org/v1/pulp_types.go
+#	sed -i "s|quay.io/pulp/pulp-web|${WEB_IMAGE}|g" apis/repo-manager.pulpproject.org/v1/pulp_types.go
+#	sed -i '0,/OperatorType/s/OperatorType.*/OperatorType  = "${LOWER_CR_KIND}"/' controllers/repo_manager/controller_test.go
+#	sed -i "s|quay.io/pulp/pulp-minimal|${APP_IMAGE}|g" controllers/repo_manager/controller_test.go
+#	mv config/crd/bases/repo-manager.pulpproject.org_pulps.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${CR_PLURAL}.yaml
+#	mv config/crd/bases/repo-manager.pulpproject.org_pulpbackups.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}backups.yaml
+#	mv config/crd/bases/repo-manager.pulpproject.org_pulprestores.yaml config/crd/bases/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}restores.yaml
+#	mv bundle/manifests/repo-manager.pulpproject.org_pulps.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${CR_PLURAL}.yaml
+#	mv bundle/manifests/repo-manager.pulpproject.org_pulpbackups.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}backups.yaml
+#	mv bundle/manifests/repo-manager.pulpproject.org_pulprestores.yaml bundle/manifests/repo-manager.${CR_DOMAIN}_${LOWER_CR_KIND}restores.yaml
+#	mv apis/repo-manager.pulpproject.org apis/repo-manager.${CR_DOMAIN}
+#	sed -i "s/repo-manager.pulpproject.org/repo-manager.${CR_DOMAIN}/g" controllers/utils.go
+#	mv config/samples/repo-manager.pulpproject.org_v1_pulp.yaml config/samples/repo-manager.${CR_DOMAIN}_v1_pulp.yaml
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
@@ -212,7 +214,7 @@ run: manifests generate fmt vet ## Run a controller from your host.
 
 .PHONY: docker-build
 docker-build: ## Build docker image with the manager.
-	$(CONTAINER_TOOL) build -t ${IMG} .
+	$(CONTAINER_TOOL) build --build-arg VERSION=${BUILD_VERSION} -t ${IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -231,7 +233,7 @@ docker-buildx: ## Build and push docker image for the manager for cross-platform
 	sed -e '1 s/\(^FROM\)/FROM --platform=\$$\{BUILDPLATFORM\}/; t' -e ' 1,// s//FROM --platform=\$$\{BUILDPLATFORM\}/' Dockerfile > Dockerfile.cross
 	- docker buildx create --name project-v3-builder
 	docker buildx use project-v3-builder
-	- docker buildx build --push --platform=$(PLATFORMS) --tag ${IMG} -f Dockerfile.cross .
+	- docker buildx build --push --platform=$(PLATFORMS) --tag ${IMG} --build-arg VERSION=${BUILD_VERSION} -f Dockerfile.cross .
 	- docker buildx rm project-v3-builder
 	rm Dockerfile.cross
 
