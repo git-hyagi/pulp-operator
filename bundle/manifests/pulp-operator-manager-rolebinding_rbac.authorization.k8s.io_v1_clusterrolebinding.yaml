@@ -10,4 +10,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: pulp-operator-controller-manager
-  namespace: pulp-operator-system
+  namespace: pulp
