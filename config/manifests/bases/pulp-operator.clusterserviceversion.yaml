@@ -1418,7 +1418,7 @@ spec:
   - email: pulp-list@redhat.com
     name: Pulp Community
   maturity: stable
-  minKubeVersion: v1.30
+  minKubeVersion: 1.30.0
   provider:
     name: Pulp Community
     url: https://github.com/pulp/pulp-operator

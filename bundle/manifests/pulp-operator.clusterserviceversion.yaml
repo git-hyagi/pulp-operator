@@ -1098,7 +1098,6 @@ spec:
 
     Pulp Operator is under active development, with the goal to provide a scalable and robust cluster for Pulp 3.
 
-    Note that Pulp operator works with three different types of service containers (the operator itself, the main service and the web service):
     <br>Pulp operator is manually built and [hosted on quay.io](https://quay.io/repository/pulp/pulp-operator). Read more about the container images [here](https://docs.pulpproject.org/pulp_operator/container/).
 
     ## Custom Resource Definitions
@@ -1421,7 +1420,7 @@ spec:
   - email: pulp-list@redhat.com
     name: Pulp Community
   maturity: stable
-  minKubeVersion: v1.30
+  minKubeVersion: 1.30.0
   provider:
     name: Pulp Community
     url: https://github.com/pulp/pulp-operator

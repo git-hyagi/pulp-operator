@@ -138,6 +138,10 @@ jobs:
           kubectl -ndefault logs localhost-5001-pulp-operator-bundle-testing
           kubectl -ndefault describe pod/localhost-5001-pulp-operator-bundle-testing
           echo ::endgroup::
+
+          echo ::group::CSV
+          kubectl get csv -A -oyaml
+          echo ::endgroup::
         shell: bash
 
   envtest:
