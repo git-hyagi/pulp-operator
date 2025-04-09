@@ -208,7 +208,7 @@ spec:
         - urn:alm:descriptor:io.kubernetes:Secret
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: 'List of allowed checksum algorithms used to verify repository''s
-          integrity. Valid options: ["md5","sha1","sha256","sha512"].'
+          integrity. Valid options: ["md5","sha1","sha224","sha256","sha384","sha512"].'
         displayName: Allowed Content Checksums
         path: allowed_content_checksums
         x-descriptors:
@@ -611,23 +611,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: 'Define if the operator should or should not deploy the default
-          Execution Environments. Default: false'
-        displayName: Deploy EEDefaults
-        path: deploy_ee_defaults
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: Disable database migrations. Useful for situations in which we
           don't want to automatically run the database migrations, for example, during
           restore.
         displayName: Disable Migrations
         path: disable_migrations
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-      - description: 'Name of the ConfigMap with the list of Execution Environments
-          that should be synchronized. Default: ee-default-images'
-        displayName: EEDefaults
-        path: ee_defaults
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: 'By default Pulp logs at INFO level, but enabling DEBUG logging
@@ -667,7 +655,7 @@ spec:
         path: image
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: 'Image pull policy for container image. Default: "IfNotPresent"'
+      - description: Image pull policy for container image.
         displayName: Image Pull Policy
         path: image_pull_policy
         x-descriptors:

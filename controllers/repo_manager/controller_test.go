@@ -718,7 +718,7 @@ exec "${PULP_API_ENTRYPOINT[@]}" \
 					Containers: []corev1.Container{{
 						Name:            "content",
 						Image:           "quay.io/pulp/pulp-minimal:latest",
-						ImagePullPolicy: corev1.PullPolicy("IfNotPresent"),
+						ImagePullPolicy: corev1.PullPolicy("Always"),
 						Command:         []string{"/bin/sh"},
 						Args: []string{
 							"-c",
@@ -806,7 +806,7 @@ exec "${PULP_CONTENT_ENTRYPOINT[@]}" \
 					Containers: []corev1.Container{{
 						Name:            "worker",
 						Image:           "quay.io/pulp/pulp-minimal:latest",
-						ImagePullPolicy: corev1.PullPolicy("IfNotPresent"),
+						ImagePullPolicy: corev1.PullPolicy("Always"),
 						Command:         []string{"/usr/bin/pulp-worker"},
 						Env:             envVarsWorker,
 						// LivenessProbe:  livenessProbe,

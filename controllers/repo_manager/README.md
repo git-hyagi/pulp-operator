@@ -213,7 +213,7 @@ PulpSpec defines the desired state of Pulp
 | image | The image name (repo name) for the pulp image. Default: \"quay.io/pulp/pulp-minimal:stable\" | string | false |
 | image_version | The image version for the pulp image. Default: \"stable\" | string | false |
 | inhibit_version_constraint | Relax the check of image_version and image_web_version not matching. Default: \"false\" | bool | false |
-| image_pull_policy | Image pull policy for container image. Default: \"IfNotPresent\" | string | false |
+| image_pull_policy | Image pull policy for container image. | string | false |
 | api | Api defines desired state of pulpcore-api resources | [Api](#api) | true |
 | database | Database defines desired state of postgres resources | [Database](#database) | false |
 | content | Content defines desired state of pulpcore-content resources | [Content](#content) | false |
@@ -229,14 +229,12 @@ PulpSpec defines the desired state of Pulp
 | sa_labels | ServiceAccount.metadata.labels that will be used in Pulp pods. | map[string]string | false |
 | sso_secret | Secret where Single Sign-on configuration can be found | string | false |
 | mount_trusted_ca | Define if the operator should or should not mount the custom CA certificates added to the cluster via cluster-wide proxy config. Default: false | bool | false |
-| deploy_ee_defaults | Define if the operator should or should not deploy the default Execution Environments. Default: false | bool | false |
-| ee_defaults | Name of the ConfigMap with the list of Execution Environments that should be synchronized. Default: ee-default-images | string | false |
 | admin_password_job | Job to reset pulp admin password | [PulpJob](#pulpjob) | false |
 | migration_job | Job to run django migrations | [PulpJob](#pulpjob) | false |
 | signing_job | Job to store signing metadata scripts | [PulpJob](#pulpjob) | false |
 | disable_migrations | Disable database migrations. Useful for situations in which we don't want to automatically run the database migrations, for example, during restore. | bool | false |
 | pulp_secret_key | Name of the Secret to provide Django cryptographic signing. Default: \"pulp-secret-key\" | string | false |
-| allowed_content_checksums | List of allowed checksum algorithms used to verify repository's integrity. Valid options: [\"md5\",\"sha1\",\"sha256\",\"sha512\"]. | []string | false |
+| allowed_content_checksums | List of allowed checksum algorithms used to verify repository's integrity. Valid options: [\"md5\",\"sha1\",\"sha224\",\"sha256\",\"sha384\",\"sha512\"]. | []string | false |
 | loadbalancer_protocol | Protocol used by pulp-web service when ingress_type==loadbalancer | string | false |
 | loadbalancer_port | Port exposed by pulp-web service when ingress_type==loadbalancer | int32 | false |
 | telemetry | Telemetry defines the OpenTelemetry configuration | [Telemetry](#telemetry) | false |

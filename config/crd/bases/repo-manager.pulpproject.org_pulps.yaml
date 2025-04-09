@@ -241,7 +241,7 @@ spec:
               allowed_content_checksums:
                 description: |-
                   List of allowed checksum algorithms used to verify repository's integrity.
-                  Valid options: ["md5","sha1","sha256","sha512"].
+                  Valid options: ["md5","sha1","sha224","sha256","sha384","sha512"].
                 items:
                   type: string
                 type: array
@@ -5691,9 +5691,8 @@ spec:
                     type: array
                 type: object
               custom_pulp_settings:
-                description: |-
-                  Name of the ConfigMap to define Pulp configurations not available
-                  through this CR.
+                description: Name of the ConfigMap to define Pulp configurations not
+                  available through this CR.
                 type: string
               database:
                 description: Database defines desired state of postgres resources
@@ -7097,21 +7096,11 @@ spec:
                   Secret where the Fernet symmetric encryption key is stored.
                   Default: <operators's name>-"-db-fields-encryption"
                 type: string
-              deploy_ee_defaults:
-                description: |-
-                  Define if the operator should or should not deploy the default Execution Environments.
-                  Default: false
-                type: boolean
               disable_migrations:
                 description: |-
                   Disable database migrations. Useful for situations in which we don't want
                   to automatically run the database migrations, for example, during restore.
                 type: boolean
-              ee_defaults:
-                description: |-
-                  Name of the ConfigMap with the list of Execution Environments that should be synchronized.
-                  Default: ee-default-images
-                type: string
               enable_debugging:
                 description: |-
                   By default Pulp logs at INFO level, but enabling DEBUG logging can be a
@@ -7146,9 +7135,7 @@ spec:
                   Default: "quay.io/pulp/pulp-minimal:stable"
                 type: string
               image_pull_policy:
-                description: |-
-                  Image pull policy for container image.
-                  Default: "IfNotPresent"
+                description: Image pull policy for container image.
                 enum:
                 - IfNotPresent
                 - Always
