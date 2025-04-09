@@ -229,10 +229,8 @@ type PulpSpec struct {
 	InhibitVersionConstraint bool `json:"inhibit_version_constraint,omitempty"`
 
 	// Image pull policy for container image.
-	// Default: "IfNotPresent"
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Enum:=IfNotPresent;Always;Never
-	// +kubebuilder:default:="IfNotPresent"
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:imagePullPolicy"}
 	ImagePullPolicy string `json:"image_pull_policy,omitempty"`
 
@@ -266,8 +264,7 @@ type PulpSpec struct {
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
 	Cache Cache `json:"cache,omitempty"`
 
-	// Name of the ConfigMap to define Pulp configurations not available
-	// through this CR.
+	// Name of the ConfigMap to define Pulp configurations not available through this CR.
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
 	CustomPulpSettings string `json:"custom_pulp_settings,omitempty"`
@@ -319,18 +316,6 @@ type PulpSpec struct {
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
 	TrustedCa bool `json:"mount_trusted_ca,omitempty"`
 
-	// Define if the operator should or should not deploy the default Execution Environments.
-	// Default: false
-	// +kubebuilder:validation:Optional
-	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
-	DeployEEDefaults bool `json:"deploy_ee_defaults,omitempty"`
-
-	// Name of the ConfigMap with the list of Execution Environments that should be synchronized.
-	// Default: ee-default-images
-	// +kubebuilder:validation:Optional
-	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
-	EEDefaults string `json:"ee_defaults,omitempty"`
-
 	// Job to reset pulp admin password
 	AdminPasswordJob PulpJob `json:"admin_password_job,omitempty"`
 
@@ -353,7 +338,7 @@ type PulpSpec struct {
 	PulpSecretKey string `json:"pulp_secret_key,omitempty"`
 
 	// List of allowed checksum algorithms used to verify repository's integrity.
-	// Valid options: ["md5","sha1","sha256","sha512"].
+	// Valid options: ["md5","sha1","sha224","sha256","sha384","sha512"].
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:advanced"}
 	AllowedContentChecksums []string `json:"allowed_content_checksums,omitempty"`

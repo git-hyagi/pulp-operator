@@ -184,7 +184,7 @@ func (d *CommonDeployment) setStrategy(pulp pulpv1.Pulp, pulpcoreType settings.P
 }
 
 // setPodSecurityContext defines the pod-level security attributes
-func (d *CommonDeployment) setPodSecurityContext(pulp pulpv1.Pulp) {
+func (d *CommonDeployment) setPodSecurityContext() {
 	runAsUser := int64(700)
 	fsGroup := int64(700)
 	d.podSecurityContext = &corev1.PodSecurityContext{
@@ -1165,7 +1165,7 @@ func (d *CommonDeployment) build(resources any, pulpcoreType settings.PulpcoreTy
 	d.setLabels(*pulp, pulpcoreType)
 	d.setAnnotations(*pulp, pulpcoreType)
 	d.setAffinity(*pulp, pulpcoreType)
-	d.setPodSecurityContext(*pulp)
+	d.setPodSecurityContext()
 	d.setNodeSelector(*pulp, pulpcoreType)
 	d.setTolerations(*pulp, pulpcoreType)
 	d.setVolumes(resources, pulpcoreType)

@@ -548,7 +548,9 @@ func validContentChecksums() map[string]bool {
 	return map[string]bool{
 		"md5":    false,
 		"sha1":   false,
+		"sha224": false,
 		"sha256": true,
+		"sha384": false,
 		"sha512": false,
 	}
 }
