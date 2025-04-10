@@ -1,10 +1,3 @@
-CR_KIND ?= Pulp
-LOWER_CR_KIND = $(shell echo $(CR_KIND) | tr A-Z a-z)
-CR_PLURAL ?= pulps
-CR_DOMAIN ?= pulpproject.org
-APP_IMAGE ?= quay.io/pulp/pulp-minimal
-WEB_IMAGE ?= quay.io/pulp/pulp-web
-
 # VERSION defines the project version for the bundle.
 # Update this value when you upgrade the version of your project.
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
@@ -41,7 +34,7 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
 # pulpproject.org/pulp-operator-bundle:$VERSION and pulpproject.org/pulp-operator-catalog:$VERSION.
 #IMAGE_TAG_BASE ?= pulpproject.org/pulp-operator
-IMAGE_TAG_BASE ?= quay.io/pulp/$(LOWER_CR_KIND)-operator
+IMAGE_TAG_BASE ?= quay.io/pulp/pulp-operator
 
 # BUNDLE_IMG defines the image:tag used for the bundle.
 # You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)
@@ -60,7 +53,7 @@ endif
 
 # Image URL to use all building/pushing image targets
 IMG ?= $(IMAGE_TAG_BASE):v$(VERSION)
-NAMESPACE ?= $(LOWER_CR_KIND)-operator-system
+NAMESPACE ?= pulp-operator-system
 WATCH_NAMESPACE ?= $(NAMESPACE)
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
@@ -115,9 +108,9 @@ help: ## Display this help.
 .PHONY: manifests
 manifests: tidy controller-gen crd-to-markdown ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-	$(CRD_MARKDOWN) -f apis/repo-manager.$(CR_DOMAIN)/v1/pulp_types.go -n $(CR_KIND) > controllers/repo_manager/README.md
-	$(CRD_MARKDOWN) -f apis/repo-manager.$(CR_DOMAIN)/v1/pulp_backup_types.go -n $(CR_KIND)Backup > controllers/backup/README.md
-	$(CRD_MARKDOWN) -f apis/repo-manager.$(CR_DOMAIN)/v1/pulp_restore_types.go -n $(CR_KIND)Restore > controllers/restore/README.md
+	$(CRD_MARKDOWN) -f apis/repo-manager.pulpproject.org/v1/pulp_types.go -n Pulp > controllers/repo_manager/README.md
+	$(CRD_MARKDOWN) -f apis/repo-manager.pulpproject.org/v1/pulp_backup_types.go -n PulpBackup > controllers/backup/README.md
+	$(CRD_MARKDOWN) -f apis/repo-manager.pulpproject.org/v1/pulp_restore_types.go -n PulpRestore > controllers/restore/README.md
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
@@ -216,7 +209,7 @@ uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified 
 
 .PHONY: local
 local: kustomize ## Run controller in the K8s cluster specified in ~/.kube/config.
-	.ci/scripts/local.sh $(CR_KIND) $(CR_DOMAIN) $(CR_PLURAL) $(APP_IMAGE) $(WEB_IMAGE)
+	.ci/scripts/local.sh Pulp pulpproject.org pulps quay.io/pulp/pulp-minimal quay.io/pulp/pulp-web
 
 .PHONY: deploy
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
