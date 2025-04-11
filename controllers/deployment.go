@@ -17,7 +17,6 @@ limitations under the License.
 package controllers
 
 import (
-	"context"
 	"os"
 	"reflect"
 	"strconv"
@@ -1108,7 +1107,7 @@ func (d *CommonDeployment) setTelemetryConfig(resources any, pulpcoreType settin
 func AddHashLabel(r FunctionResources, deployment *appsv1.Deployment) {
 	// if the object does not exist yet we need to mutate the object to get the
 	// default values (I think they are added by the admission controller)
-	if err := r.Create(context.TODO(), deployment, client.DryRunAll); err != nil {
+	if err := r.Create(r.Context, deployment, client.DryRunAll); err != nil {
 		SetHashLabel(HashFromMutated(deployment, r), deployment)
 	} else {
 		SetHashLabel(CalculateHash(deployment.Spec), deployment)

@@ -41,11 +41,11 @@ func (r *RepoManagerReconciler) updateAdminPasswordJob(ctx context.Context, pulp
 		log.Error(err, "Failed to find "+adminSecretName+" Secret!")
 	}
 
-	// if the secret is already set (it is not the first execution) and it
+	// if the secret is the same and its content
 	// didn't change, there is nothing to do
 	calculatedHash := controllers.CalculateHash(adminSecret.Data)
 	currentHash := controllers.GetCurrentHash(adminSecret)
-	if pulp.Status.AdminPasswordSecret != "" && currentHash == calculatedHash {
+	if pulp.Status.AdminPasswordSecret == pulp.Spec.AdminPasswordSecret && currentHash == calculatedHash {
 		return
 	}
 

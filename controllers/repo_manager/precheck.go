@@ -60,9 +60,9 @@ func prechecks(ctx context.Context, r *RepoManagerReconciler, pulp *pulpv1.Pulp)
 	}
 
 	// verify if a change in an immutable field has been tried
-	if reconcile := checkImmutableFields(ctx, r, pulp); reconcile != nil {
-		return reconcile, nil
-	}
+	//if reconcile := checkImmutableFields(ctx, r, pulp); reconcile != nil {
+	//	return reconcile, nil
+	//}
 
 	// verify if all secrets defined in pulp cr are available
 	if reconcile := checkSecretsAvailability(ctx, r, pulp); reconcile != nil {

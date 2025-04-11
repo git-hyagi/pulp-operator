@@ -814,7 +814,7 @@ func GetCurrentHash(obj client.Object) string {
 func HashFromMutated(dep *appsv1.Deployment, resources FunctionResources) string {
 	// execute a "dry run" to update the local "deploy" variable with all
 	// mutated configurations
-	resources.Update(context.TODO(), dep, client.DryRunAll)
+	resources.Update(resources.Context, dep, client.DryRunAll)
 	return CalculateHash(dep.Spec)
 }
 

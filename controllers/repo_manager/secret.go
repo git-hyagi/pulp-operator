@@ -109,7 +109,7 @@ func (r *RepoManagerReconciler) createSecrets(ctx context.Context, pulp *pulpv1.
 	expectedServerSecret := pulpServerSecret(funcResources)
 	if requeue, err := controllers.ReconcileObject(funcResources, expectedServerSecret, serverSecret, conditionType, controllers.PulpSecret{}); err != nil || requeue {
 		// restart pulpcore pods if the secret has changed
-		r.restartPulpCorePods(pulp)
+		r.restartPulpCorePods(ctx, pulp)
 		return &ctrl.Result{Requeue: requeue}, err
 	}
 
@@ -464,7 +464,7 @@ func secretKeySettings(resources controllers.FunctionResources, pulpSettings *st
 		return
 	}
 
-	*pulpSettings = *pulpSettings + fmt.Sprintln("SECRET_KEY = \""+secretKey["secret_key"]+"\"")
+	*pulpSettings = *pulpSettings + fmt.Sprintf("SECRET_KEY = \"%v\"\n", secretKey["secret_key"])
 }
 
 // allowedContentChecksumsSettings appends the allowed_content_checksums into pulpSettings

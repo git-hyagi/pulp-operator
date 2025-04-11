@@ -141,7 +141,7 @@ func (r *RepoManagerReconciler) setStatusConditions(ctx context.Context, pulp *p
 			Message:            "All tasks ran successfully",
 		})
 
-		if err := r.Status().Update(context.Background(), pulp); err != nil && errors.IsConflict(err) {
+		if err := r.Status().Update(ctx, pulp); err != nil && errors.IsConflict(err) {
 			log.V(1).Info("Failed to update pulp status", "error", err)
 			return &ctrl.Result{Requeue: true}
 		}
@@ -236,7 +236,7 @@ func objS3SecretCondition() func(*pulpv1.Pulp) bool {
 // dbFieldsEncrSecretCondition returns the function to verify if a new pulp.Status.DBFieldsEncryptionSecret should be set
 func dbFieldsEncrSecretCondition() func(*pulpv1.Pulp) bool {
 	return func(pulp *pulpv1.Pulp) bool {
-		return len(pulp.Status.DBFieldsEncryptionSecret) == 0 && len(pulp.Spec.DBFieldsEncryptionSecret) > 0
+		return len(pulp.Status.DBFieldsEncryptionSecret) == 0 || pulp.Spec.DBFieldsEncryptionSecret != pulp.Status.DBFieldsEncryptionSecret
 	}
 }
 
@@ -248,21 +248,21 @@ func ingressTypeCondition() func(*pulpv1.Pulp) bool {
 // containerTokenSecretCondition returns the function to verify if a new pulp.Status.ContainerTokenSecret should be set
 func containerTokenSecretCondition() func(*pulpv1.Pulp) bool {
 	return func(pulp *pulpv1.Pulp) bool {
-		return len(pulp.Status.ContainerTokenSecret) == 0 && len(pulp.Spec.ContainerTokenSecret) > 0
+		return len(pulp.Status.ContainerTokenSecret) == 0 || pulp.Spec.ContainerTokenSecret != pulp.Status.ContainerTokenSecret
 	}
 }
 
 // adminPwdSecretCondition returns the function to verify if a new pulp.Status.AdminPasswordSecret should be set
 func adminPwdSecretCondition() func(*pulpv1.Pulp) bool {
 	return func(pulp *pulpv1.Pulp) bool {
-		return len(pulp.Status.AdminPasswordSecret) == 0 && len(pulp.Spec.AdminPasswordSecret) > 0
+		return len(pulp.Status.AdminPasswordSecret) == 0 || pulp.Spec.AdminPasswordSecret != pulp.Status.AdminPasswordSecret
 	}
 }
 
 // externalCacheSecretCondition returns the function to verify if a new pulp.Status.ExternalCacheSecret should be set
 func externalCacheSecretCondition() func(*pulpv1.Pulp) bool {
 	return func(pulp *pulpv1.Pulp) bool {
-		return len(pulp.Status.ExternalCacheSecret) == 0 && len(pulp.Spec.Cache.ExternalCacheSecret) > 0
+		return len(pulp.Status.ExternalCacheSecret) == 0 || pulp.Spec.Cache.ExternalCacheSecret != pulp.Status.ExternalCacheSecret
 	}
 }
 
@@ -283,7 +283,7 @@ func telemetryEnabledCondition() func(*pulpv1.Pulp) bool {
 // pulpSecretKeyCondition returns the function to verify if a new pulp.Status.PulpSecretKey should be set
 func pulpSecretKeyCondition() func(*pulpv1.Pulp) bool {
 	return func(pulp *pulpv1.Pulp) bool {
-		return len(pulp.Status.PulpSecretKey) == 0 && len(pulp.Spec.PulpSecretKey) > 0
+		return len(pulp.Status.PulpSecretKey) == 0 || pulp.Spec.PulpSecretKey != pulp.Status.PulpSecretKey
 	}
 }
 

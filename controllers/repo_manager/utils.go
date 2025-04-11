@@ -458,7 +458,7 @@ func (r *RepoManagerReconciler) findPulpDependentObjects(ctx context.Context, ob
 		FieldSelector: fields.OneTermEqualSelector("objects", obj.GetName()),
 		Namespace:     obj.GetNamespace(),
 	}
-	if err := r.List(context.TODO(), &associatedPulp, opts); err != nil {
+	if err := r.List(ctx, &associatedPulp, opts); err != nil {
 		return []reconcile.Request{}
 	}
 	if len(associatedPulp.Items) > 0 {
@@ -474,11 +474,10 @@ func (r *RepoManagerReconciler) findPulpDependentObjects(ctx context.Context, ob
 }
 
 // restartPulpCorePods will redeploy all pulpcore (API,content,worker) pods.
-func (r *RepoManagerReconciler) restartPulpCorePods(pulp *pulpv1.Pulp) {
-	log := r.RawLogger
-	log.Info("Reprovisioning pulpcore pods to get the new settings ...")
+func (r *RepoManagerReconciler) restartPulpCorePods(ctx context.Context, pulp *pulpv1.Pulp) {
+	r.RawLogger.Info("Reprovisioning pulpcore pods to get the new settings ...")
 	pulp.Status.LastDeploymentUpdate = time.Now().Format(time.RFC3339)
-	r.Status().Update(context.TODO(), pulp)
+	r.Status().Update(ctx, pulp)
 }
 
 // runMigration deploys a k8s Job to run django migrations in case of pulpcore image change
@@ -630,7 +629,7 @@ func (r *RepoManagerReconciler) runSigningSecretTasks(ctx context.Context, pulp 
 		return nil
 	}
 
-	r.restartPulpCorePods(pulp)
+	r.restartPulpCorePods(ctx, pulp)
 	secret := &corev1.Secret{}
 	if err := r.Get(ctx, types.NamespacedName{Name: secretName, Namespace: pulp.Namespace}, secret); err != nil {
 		r.RawLogger.Error(err, "Failed to find "+secretName+" Secret!")
