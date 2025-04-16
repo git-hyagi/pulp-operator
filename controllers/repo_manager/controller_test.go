@@ -1255,24 +1255,3 @@ func objectGet[T client.Object](ctx context.Context, object T, objectName string
 		return true
 	}, timeout, interval).Should(BeTrue())
 }
-
-/*
-// Alternative implementation without generics because i'm not sure if github runner is
-// installed with golang 1.18+ and in case we need backward compatibility
-// (keeping it just in case, but we should clean this up if not needed)
-func objectUpdate(pulp any) {
-	var obj client.Object
-	switch objType := pulp.(type) {
-	case client.Object:
-		obj = objType
-	}
-
-	Eventually(func() bool {
-		if err := k8sClient.Update(ctx, obj); err != nil {
-			fmt.Println("Error trying to update pulp: ", err)
-			return false
-		}
-		return true
-	}, timeout, interval).Should(BeTrue())
-}
-*/

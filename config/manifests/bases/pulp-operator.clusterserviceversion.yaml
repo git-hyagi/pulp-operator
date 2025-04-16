@@ -1085,7 +1085,7 @@ spec:
     Pulp is completely free and open-source!
 
     * License: GPLv2+
-    * Documentation: [https://docs.pulpproject.org/](https://docs.pulpproject.org/)
+    * Documentation: [https://pulpproject.org/](https://pulpproject.org/)
     * Source: [https://github.com/pulp/pulpcore/](https://github.com/pulp/pulpcore/)
 
     For more information, check out the project website: [https://pulpproject.org](https://pulpproject.org)
@@ -1096,7 +1096,7 @@ spec:
 
     Pulp Operator is under active development, with the goal to provide a scalable and robust cluster for Pulp 3.
 
-    <br>Pulp operator is manually built and [hosted on quay.io](https://quay.io/repository/pulp/pulp-operator). Read more about the container images [here](https://docs.pulpproject.org/pulp_operator/container/).
+    <br>Pulp operator is manually built and [hosted on quay.io](https://quay.io/repository/pulp/pulp-operator). Read more about the container images [here](https://pulpproject.org/pulp-oci-images/docs/admin/reference/available-images/single-process-images/).
 
     ## Custom Resource Definitions
     Pulp Operator currently provides three different kinds of [Custom Resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#custom-resources): Pulp, Pulp Backup and Pulp Restore.
@@ -1110,7 +1110,7 @@ spec:
 
     ## Get Help
 
-    Documentation: [https://docs.pulpproject.org/pulp_operator/](https://docs.pulpproject.org/pulp_operator/)
+    Documentation: [https://pulpproject.org/pulp_operator/](https://pulpproject.org/pulp_operator/)
 
     Issue Tracker: [https://github.com/pulp/pulp-operator/issues](https://github.com/pulp/pulp-operator/issues)
 
@@ -1401,7 +1401,7 @@ spec:
   - name: Pulp Project
     url: https://pulpproject.org/
   - name: Docs
-    url: https://docs.pulpproject.org/pulp_operator/
+    url: https://pulpproject.org/pulp_operator/
   maintainers:
   - email: pulp-list@redhat.com
     name: Pulp Community
