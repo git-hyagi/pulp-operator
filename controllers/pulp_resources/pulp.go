@@ -10,7 +10,7 @@ import (
 	bindings "github.com/pulp/pulp-operator/bindings/release"
 )
 
-func (r *RepoManagerPulpResourceReconciler) createPulpResources(pulpResource *pulpv1.PulpResource, pulpClient pulpClient) {
+func (r *RepoManagerPulpResourceReconciler) createPulpResources(ctx context.Context, pulpResource *pulpv1.PulpResource, pulpClient pulpClient, clientBinding *bindings.APIClient) {
 
 	log := pulpClient.Log
 	owner := pulpResourceOwner(*pulpResource)
@@ -48,7 +48,7 @@ func (r *RepoManagerPulpResourceReconciler) createPulpResources(pulpResource *pu
 				}
 
 				resourceName := reflect.Indirect(resourceValue).FieldByName("Name").Interface().(string)
-				if response, exists := resource_exists(pulpClient, endpoint, resourceName); exists {
+				if response, exists := resource_exists(ctx, pulpClient, endpoint, resourceName, clientBinding); exists {
 					// if already exists and responsebody is equal to what is in the spec, nothing to do
 					// if already exists, but what we got from pulp is different from what is in the spec we need to update it
 					if !owned_by_operator(response, owner) {
@@ -60,12 +60,7 @@ func (r *RepoManagerPulpResourceReconciler) createPulpResources(pulpResource *pu
 				}
 
 				// [WIP] TEST USING BINDINGS
-				cfg := bindings.NewConfiguration()
-				client := bindings.NewAPIClient(cfg)
-
-				ctx := context.WithValue(context.Background(), bindings.ContextBasicAuth, bindings.BasicAuth{UserName: "admin", Password: "password"})
-				fileDistributionRequest := client.DistributionsFileAPI.DistributionsFileFileCreate(ctx)
-
+				fileDistributionRequest := clientBinding.DistributionsFileAPI.DistributionsFileFileCreate(ctx)
 				newFileDistribution := bindings.NewFileFileDistribution("test", "test")
 				fileCreateRequest := fileDistributionRequest.FileFileDistribution(*newFileDistribution)
 				_, _, err := fileCreateRequest.Execute()

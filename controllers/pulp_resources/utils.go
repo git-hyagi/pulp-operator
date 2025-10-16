@@ -14,6 +14,7 @@ import (
 
 	"github.com/go-logr/logr"
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
+	bindings "github.com/pulp/pulp-operator/bindings/release"
 	"github.com/pulp/pulp-operator/controllers/settings"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -132,7 +133,21 @@ func field_empty(field reflect.Value) bool {
 }
 
 // resource_exists verifies if pulp resource already exists
-func resource_exists(pulpClient pulpClient, endpoint string, resource any) (responseBody, bool) {
+func resource_exists(ctx context.Context, pulpClient pulpClient, endpoint string, resource any, clientBinding *bindings.APIClient) (responseBody, bool) {
+
+	fileDistributionRequest := clientBinding.DistributionsFileAPI.DistributionsFileFileList(ctx)
+	fileCreateRequest := fileDistributionRequest.Name(resource.(string))
+	a, bindingResponse, err := fileCreateRequest.Execute()
+	if err != nil {
+		pulpClient.Log.Error(err, "############ Failed to create file distribution ###################", bindingResponse)
+	}
+	b := fmt.Sprintf("File distribution found!\n")
+	for _, v := range a.Results {
+		b += fmt.Sprintf("name: %+v\n", v.Name)
+		b += fmt.Sprintf("pulp_href: %+v\n", *v.PulpHref)
+	}
+	pulpClient.Log.Info(b)
+
 	// todo: pending handle errors (like 401, 403, etc)
 	response, err := make_request("GET", pulpClient.Address+endpoint, pulpClient.Username, pulpClient.Password, resource)
 	if err != nil {
