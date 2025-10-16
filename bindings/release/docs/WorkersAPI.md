@@ -1,0 +1,207 @@
+# \WorkersAPI
+
+All URIs are relative to *http://pulp-web-svc-pulp.apps-crc.testing*
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**WorkersList**](WorkersAPI.md#WorkersList) | **Get** /api/v3/workers/ | List app statuss
+[**WorkersRead**](WorkersAPI.md#WorkersRead) | **Get** /{worker_href} | Inspect an app status
+
+
+
+## WorkersList
+
+> PaginatedWorkerResponseList WorkersList(ctx).XTaskDiagnostics(xTaskDiagnostics).LastHeartbeat(lastHeartbeat).LastHeartbeatGt(lastHeartbeatGt).LastHeartbeatGte(lastHeartbeatGte).LastHeartbeatIsnull(lastHeartbeatIsnull).LastHeartbeatLt(lastHeartbeatLt).LastHeartbeatLte(lastHeartbeatLte).LastHeartbeatRange(lastHeartbeatRange).Limit(limit).Missing(missing).Name(name).NameContains(nameContains).NameIcontains(nameIcontains).NameIexact(nameIexact).NameIn(nameIn).NameIregex(nameIregex).NameIstartswith(nameIstartswith).NameRegex(nameRegex).NameStartswith(nameStartswith).Offset(offset).Online(online).Ordering(ordering).PrnIn(prnIn).PulpHrefIn(pulpHrefIn).PulpIdIn(pulpIdIn).Q(q).Fields(fields).ExcludeFields(excludeFields).Execute()
+
+List app statuss
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+    "time"
+	openapiclient "github.com/pulp/pulp-operator/bindings/release"
+)
+
+func main() {
+	xTaskDiagnostics := []string{"Inner_example"} // []string | List of profilers to use on tasks. (optional)
+	lastHeartbeat := time.Now() // time.Time | Filter results where last_heartbeat matches value (optional)
+	lastHeartbeatGt := time.Now() // time.Time | Filter results where last_heartbeat is greater than value (optional)
+	lastHeartbeatGte := time.Now() // time.Time | Filter results where last_heartbeat is greater than or equal to value (optional)
+	lastHeartbeatIsnull := true // bool | Filter results where last_heartbeat has a null value (optional)
+	lastHeartbeatLt := time.Now() // time.Time | Filter results where last_heartbeat is less than value (optional)
+	lastHeartbeatLte := time.Now() // time.Time | Filter results where last_heartbeat is less than or equal to value (optional)
+	lastHeartbeatRange := []time.Time{time.Now()} // []time.Time | Filter results where last_heartbeat is between two comma separated values (optional)
+	limit := int32(56) // int32 | Number of results to return per page. (optional)
+	missing := true // bool |  (optional)
+	name := "name_example" // string | Filter results where name matches value (optional)
+	nameContains := "nameContains_example" // string | Filter results where name contains value (optional)
+	nameIcontains := "nameIcontains_example" // string | Filter results where name contains value (optional)
+	nameIexact := "nameIexact_example" // string | Filter results where name matches value (optional)
+	nameIn := []string{"Inner_example"} // []string | Filter results where name is in a comma-separated list of values (optional)
+	nameIregex := "nameIregex_example" // string | Filter results where name matches regex value (optional)
+	nameIstartswith := "nameIstartswith_example" // string | Filter results where name starts with value (optional)
+	nameRegex := "nameRegex_example" // string | Filter results where name matches regex value (optional)
+	nameStartswith := "nameStartswith_example" // string | Filter results where name starts with value (optional)
+	offset := int32(56) // int32 | The initial index from which to return the results. (optional)
+	online := true // bool |  (optional)
+	ordering := []string{"Ordering_example"} // []string | Ordering* `pulp_id` - Pulp id* `-pulp_id` - Pulp id (descending)* `pulp_created` - Pulp created* `-pulp_created` - Pulp created (descending)* `pulp_last_updated` - Pulp last updated* `-pulp_last_updated` - Pulp last updated (descending)* `app_type` - App type* `-app_type` - App type (descending)* `name` - Name* `-name` - Name (descending)* `versions` - Versions* `-versions` - Versions (descending)* `ttl` - Ttl* `-ttl` - Ttl (descending)* `last_heartbeat` - Last heartbeat* `-last_heartbeat` - Last heartbeat (descending)* `pk` - Pk* `-pk` - Pk (descending) (optional)
+	prnIn := []string{"Inner_example"} // []string | Multiple values may be separated by commas. (optional)
+	pulpHrefIn := []string{"Inner_example"} // []string | Multiple values may be separated by commas. (optional)
+	pulpIdIn := []string{"Inner_example"} // []string | Multiple values may be separated by commas. (optional)
+	q := "q_example" // string | Filter results by using NOT, AND and OR operations on other filters (optional)
+	fields := []string{"Inner_example"} // []string | A list of fields to include in the response. (optional)
+	excludeFields := []string{"Inner_example"} // []string | A list of fields to exclude from the response. (optional)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.WorkersAPI.WorkersList(context.Background()).XTaskDiagnostics(xTaskDiagnostics).LastHeartbeat(lastHeartbeat).LastHeartbeatGt(lastHeartbeatGt).LastHeartbeatGte(lastHeartbeatGte).LastHeartbeatIsnull(lastHeartbeatIsnull).LastHeartbeatLt(lastHeartbeatLt).LastHeartbeatLte(lastHeartbeatLte).LastHeartbeatRange(lastHeartbeatRange).Limit(limit).Missing(missing).Name(name).NameContains(nameContains).NameIcontains(nameIcontains).NameIexact(nameIexact).NameIn(nameIn).NameIregex(nameIregex).NameIstartswith(nameIstartswith).NameRegex(nameRegex).NameStartswith(nameStartswith).Offset(offset).Online(online).Ordering(ordering).PrnIn(prnIn).PulpHrefIn(pulpHrefIn).PulpIdIn(pulpIdIn).Q(q).Fields(fields).ExcludeFields(excludeFields).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `WorkersAPI.WorkersList``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `WorkersList`: PaginatedWorkerResponseList
+	fmt.Fprintf(os.Stdout, "Response from `WorkersAPI.WorkersList`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiWorkersListRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **xTaskDiagnostics** | **[]string** | List of profilers to use on tasks. | 
+ **lastHeartbeat** | **time.Time** | Filter results where last_heartbeat matches value | 
+ **lastHeartbeatGt** | **time.Time** | Filter results where last_heartbeat is greater than value | 
+ **lastHeartbeatGte** | **time.Time** | Filter results where last_heartbeat is greater than or equal to value | 
+ **lastHeartbeatIsnull** | **bool** | Filter results where last_heartbeat has a null value | 
+ **lastHeartbeatLt** | **time.Time** | Filter results where last_heartbeat is less than value | 
+ **lastHeartbeatLte** | **time.Time** | Filter results where last_heartbeat is less than or equal to value | 
+ **lastHeartbeatRange** | [**[]time.Time**](time.Time.md) | Filter results where last_heartbeat is between two comma separated values | 
+ **limit** | **int32** | Number of results to return per page. | 
+ **missing** | **bool** |  | 
+ **name** | **string** | Filter results where name matches value | 
+ **nameContains** | **string** | Filter results where name contains value | 
+ **nameIcontains** | **string** | Filter results where name contains value | 
+ **nameIexact** | **string** | Filter results where name matches value | 
+ **nameIn** | **[]string** | Filter results where name is in a comma-separated list of values | 
+ **nameIregex** | **string** | Filter results where name matches regex value | 
+ **nameIstartswith** | **string** | Filter results where name starts with value | 
+ **nameRegex** | **string** | Filter results where name matches regex value | 
+ **nameStartswith** | **string** | Filter results where name starts with value | 
+ **offset** | **int32** | The initial index from which to return the results. | 
+ **online** | **bool** |  | 
+ **ordering** | **[]string** | Ordering* &#x60;pulp_id&#x60; - Pulp id* &#x60;-pulp_id&#x60; - Pulp id (descending)* &#x60;pulp_created&#x60; - Pulp created* &#x60;-pulp_created&#x60; - Pulp created (descending)* &#x60;pulp_last_updated&#x60; - Pulp last updated* &#x60;-pulp_last_updated&#x60; - Pulp last updated (descending)* &#x60;app_type&#x60; - App type* &#x60;-app_type&#x60; - App type (descending)* &#x60;name&#x60; - Name* &#x60;-name&#x60; - Name (descending)* &#x60;versions&#x60; - Versions* &#x60;-versions&#x60; - Versions (descending)* &#x60;ttl&#x60; - Ttl* &#x60;-ttl&#x60; - Ttl (descending)* &#x60;last_heartbeat&#x60; - Last heartbeat* &#x60;-last_heartbeat&#x60; - Last heartbeat (descending)* &#x60;pk&#x60; - Pk* &#x60;-pk&#x60; - Pk (descending) | 
+ **prnIn** | **[]string** | Multiple values may be separated by commas. | 
+ **pulpHrefIn** | **[]string** | Multiple values may be separated by commas. | 
+ **pulpIdIn** | **[]string** | Multiple values may be separated by commas. | 
+ **q** | **string** | Filter results by using NOT, AND and OR operations on other filters | 
+ **fields** | **[]string** | A list of fields to include in the response. | 
+ **excludeFields** | **[]string** | A list of fields to exclude from the response. | 
+
+### Return type
+
+[**PaginatedWorkerResponseList**](PaginatedWorkerResponseList.md)
+
+### Authorization
+
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## WorkersRead
+
+> WorkerResponse WorkersRead(ctx, workerHref).XTaskDiagnostics(xTaskDiagnostics).Fields(fields).ExcludeFields(excludeFields).Execute()
+
+Inspect an app status
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/pulp/pulp-operator/bindings/release"
+)
+
+func main() {
+	workerHref := "workerHref_example" // string | 
+	xTaskDiagnostics := []string{"Inner_example"} // []string | List of profilers to use on tasks. (optional)
+	fields := []string{"Inner_example"} // []string | A list of fields to include in the response. (optional)
+	excludeFields := []string{"Inner_example"} // []string | A list of fields to exclude from the response. (optional)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.WorkersAPI.WorkersRead(context.Background(), workerHref).XTaskDiagnostics(xTaskDiagnostics).Fields(fields).ExcludeFields(excludeFields).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `WorkersAPI.WorkersRead``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `WorkersRead`: WorkerResponse
+	fmt.Fprintf(os.Stdout, "Response from `WorkersAPI.WorkersRead`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**workerHref** | **string** |  | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiWorkersReadRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **xTaskDiagnostics** | **[]string** | List of profilers to use on tasks. | 
+ **fields** | **[]string** | A list of fields to include in the response. | 
+ **excludeFields** | **[]string** | A list of fields to exclude from the response. | 
+
+### Return type
+
+[**WorkerResponse**](WorkerResponse.md)
+
+### Authorization
+
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+

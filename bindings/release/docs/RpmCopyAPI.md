@@ -1,0 +1,77 @@
+# \RpmCopyAPI
+
+All URIs are relative to *http://pulp-web-svc-pulp.apps-crc.testing*
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**CopyContent3**](RpmCopyAPI.md#CopyContent3) | **Post** /api/v3/rpm/copy/ | Copy content
+
+
+
+## CopyContent3
+
+> AsyncOperationResponse CopyContent3(ctx).Copy(copy).XTaskDiagnostics(xTaskDiagnostics).Execute()
+
+Copy content
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/pulp/pulp-operator/bindings/release"
+)
+
+func main() {
+	copy := *openapiclient.NewCopy(map[string]interface{}(123)) // Copy | 
+	xTaskDiagnostics := []string{"Inner_example"} // []string | List of profilers to use on tasks. (optional)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.RpmCopyAPI.CopyContent3(context.Background()).Copy(copy).XTaskDiagnostics(xTaskDiagnostics).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `RpmCopyAPI.CopyContent3``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `CopyContent3`: AsyncOperationResponse
+	fmt.Fprintf(os.Stdout, "Response from `RpmCopyAPI.CopyContent3`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiCopyContent3Request struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **copy** | [**Copy**](Copy.md) |  | 
+ **xTaskDiagnostics** | **[]string** | List of profilers to use on tasks. | 
+
+### Return type
+
+[**AsyncOperationResponse**](AsyncOperationResponse.md)
+
+### Authorization
+
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth)
+
+### HTTP request headers
+
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+

@@ -1,0 +1,23 @@
+# https://github.com/content-services/zest/blob/main/.github/workflows/pulp.yml#L64
+
+BASE_ADDR=pulp-web-svc-pulp.apps-crc.testing
+API_ROOT='/'
+curl http://${BASE_ADDR}${API_ROOT}api/v3/docs/api.json > bindings/pulp_api.json
+
+echo "$( jq '.components.schemas.TaskResponse.properties.error.additionalProperties.type = "string"' bindings/pulp_api.json )" > bindings/pulp_api.json
+
+sed -i 's/\\n//g' bindings/pulp_api.json
+
+podman run --rm -v ./bindings:/local:Z docker.io/openapitools/openapi-generator-cli:latest-release generate \
+    -i /local/pulp_api.json \
+    -t /local/templates/ \
+    -g go \
+    -o /local/release --minimal-update --skip-validate-spec \
+    --git-user-id=pulp --git-repo-id=pulp-operator/bindings/release \
+    --package-name=pulpbindings -p enumClassPrefix=true  -p structPrefix=true \
+    -p disallowAdditionalPropertiesIfNotPresent=false \
+    -p packageVersion=0.0.1 \
+    --global-property skipFormModel=false
+
+rm bindings/release/go.{mod,sum}
+rm bindings/release/git_push.sh

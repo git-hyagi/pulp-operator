@@ -104,6 +104,7 @@ rules:
   - repo-manager.pulpproject.org
   resources:
   - pulpbackups
+  - pulpresources
   - pulprestores
   - pulps
   verbs:
@@ -118,6 +119,7 @@ rules:
   - repo-manager.pulpproject.org
   resources:
   - pulpbackups/finalizers
+  - pulpresources/finalizers
   - pulprestores/finalizers
   - pulps/finalizers
   verbs:
@@ -126,6 +128,7 @@ rules:
   - repo-manager.pulpproject.org
   resources:
   - pulpbackups/status
+  - pulpresources/status
   - pulprestores/status
   - pulps/status
   verbs:

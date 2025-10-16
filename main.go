@@ -45,6 +45,7 @@ import (
 
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	repo_manager_backup "github.com/pulp/pulp-operator/controllers/backup"
+	repo_manager_pulp "github.com/pulp/pulp-operator/controllers/pulp_resources"
 	repo_manager "github.com/pulp/pulp-operator/controllers/repo_manager"
 	repo_manager_restore "github.com/pulp/pulp-operator/controllers/restore"
 	//+kubebuilder:scaffold:imports
@@ -190,6 +191,16 @@ func main() {
 		Scheme:     mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "PulpRestore")
+		os.Exit(1)
+	}
+	if err = (&repo_manager_pulp.RepoManagerPulpResourceReconciler{
+		Client:     mgr.GetClient(),
+		RawLogger:  mgr.GetLogger(),
+		RESTClient: restClient,
+		RESTConfig: mgr.GetConfig(),
+		Scheme:     mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "PulpResource")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
