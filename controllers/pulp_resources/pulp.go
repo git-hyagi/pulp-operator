@@ -48,7 +48,7 @@ func (r *RepoManagerPulpResourceReconciler) createPulpResources(ctx context.Cont
 				}
 
 				resourceName := reflect.Indirect(resourceValue).FieldByName("Name").Interface().(string)
-				if response, exists := resource_exists(ctx, pulpClient, endpoint, resourceName, clientBinding); exists {
+				if response, exists := resource_exists(ctx, pulpClient, endpoint, resourceName, clientBinding, resourceType, pluginName); exists {
 					// if already exists and responsebody is equal to what is in the spec, nothing to do
 					// if already exists, but what we got from pulp is different from what is in the spec we need to update it
 					if !owned_by_operator(response, owner) {

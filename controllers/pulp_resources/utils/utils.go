@@ -1,4 +1,4 @@
-package pulp_resources
+package utils
 
 import (
 	"bytes"
@@ -10,14 +10,11 @@ import (
 	"io"
 	"net/http"
 	"reflect"
-	"sync"
 
 	"github.com/go-logr/logr"
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	bindings "github.com/pulp/pulp-operator/bindings/release"
 	"github.com/pulp/pulp-operator/controllers/settings"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 var (
@@ -61,7 +58,7 @@ func get_api_svc(pulpName string) string {
 	return fmt.Sprintf("http://%s:24817", settings.ApiService(pulpName))
 }
 
-func get_credentials(ctx context.Context, r RepoManagerPulpResourceReconciler, pulpName, namespace string) string {
+/* func get_credentials(ctx context.Context, r RepoManagerPulpResourceReconciler, pulpName, namespace string) string {
 	pulp := &pulpv1.Pulp{}
 	r.Get(ctx, types.NamespacedName{Name: pulpName, Namespace: namespace}, pulp)
 
@@ -70,7 +67,7 @@ func get_credentials(ctx context.Context, r RepoManagerPulpResourceReconciler, p
 	r.Get(ctx, types.NamespacedName{Name: adminSecret, Namespace: namespace}, secret)
 
 	return string(secret.Data["password"])
-}
+} */
 
 func make_request(method, addr, user, pass string, body any) (responseBody, error) {
 	// todo: this config should come from pulpClient
@@ -121,32 +118,49 @@ func make_request(method, addr, user, pass string, body any) (responseBody, erro
 }
 
 // is_status_plugin_equals_to_spec compares the definitions of pulpresource.status and pulpresource.spec
-func is_status_plugin_equals_to_spec(pulpResource *pulpv1.PulpResource, plugin string) bool {
+func IsStatusPluginEqualsToSpec(pulpResource *pulpv1.PulpResource, plugin string) bool {
 	return reflect.DeepEqual(
 		reflect.ValueOf(*pulpResource).FieldByName("Status").Elem().FieldByName(plugin).Interface(),
 		reflect.ValueOf(*pulpResource).FieldByName("Spec").FieldByName(plugin).Interface())
 }
 
 // field_empty checks is a pulpresource field is defined
-func field_empty(field reflect.Value) bool {
+func FieldEmpty(field reflect.Value) bool {
 	return !field.IsValid() || field.IsZero()
 }
 
 // resource_exists verifies if pulp resource already exists
-func resource_exists(ctx context.Context, pulpClient pulpClient, endpoint string, resource any, clientBinding *bindings.APIClient) (responseBody, bool) {
+func ResourceExists(ctx context.Context, pulpClient pulpClient, endpoint string, resource any, clientBinding *bindings.APIClient, resourceName, pluginName string) (responseBody, bool) {
+	log := pulpClient.Log
+	serviceAPI := fmt.Sprintf("%ss%sAPI", resourceName, pluginName)
+	//fileDistributionRequest := clientBinding.DistributionsFileAPI.DistributionsFileFileList(ctx)
+	serviceAPIField := reflect.ValueOf(*clientBinding).FieldByName(serviceAPI)
+	if serviceAPIField.IsValid() {
+		listAPI := fmt.Sprintf("%ss%s%sList", resourceName, pluginName, pluginName)
+		fDR := serviceAPIField.MethodByName(listAPI)
+		log.Info("serviceAPI: " + serviceAPI)
+		log.Info("listAPI: " + listAPI)
 
-	fileDistributionRequest := clientBinding.DistributionsFileAPI.DistributionsFileFileList(ctx)
-	fileCreateRequest := fileDistributionRequest.Name(resource.(string))
-	a, bindingResponse, err := fileCreateRequest.Execute()
-	if err != nil {
-		pulpClient.Log.Error(err, "############ Failed to create file distribution ###################", bindingResponse)
+		if fDR.IsValid() {
+			result := fDR.Call([]reflect.Value{reflect.ValueOf(ctx)})
+			fmt.Printf("%v\n", reflect.TypeOf(result[0].Interface()).Name())
+			if reflect.TypeOf(result[0].Interface()).Name() == "DistributionsFileAPIDistributionsFileFileListRequest" {
+				fileDistributionRequest := result[0].Interface().(bindings.DistributionsFileAPIDistributionsFileFileListRequest)
+				fileCreateRequest := fileDistributionRequest.Name(resource.(string))
+				a, bindingResponse, err := fileCreateRequest.Execute()
+				if err != nil {
+					log.Error(err, "############ Failed to create file distribution ###################", bindingResponse)
+				}
+				b := fmt.Sprintf("File distribution found!\n")
+				for _, v := range a.Results {
+					b += fmt.Sprintf("name: %+v\n", v.Name)
+					b += fmt.Sprintf("pulp_href: %+v\n", *v.PulpHref)
+				}
+				log.Info(b)
+			}
+
+		}
 	}
-	b := fmt.Sprintf("File distribution found!\n")
-	for _, v := range a.Results {
-		b += fmt.Sprintf("name: %+v\n", v.Name)
-		b += fmt.Sprintf("pulp_href: %+v\n", *v.PulpHref)
-	}
-	pulpClient.Log.Info(b)
 
 	// todo: pending handle errors (like 401, 403, etc)
 	response, err := make_request("GET", pulpClient.Address+endpoint, pulpClient.Username, pulpClient.Password, resource)
@@ -184,11 +198,11 @@ func create_status_fields(pulpResource *pulpv1.PulpResource, plugin string, reso
 }
 
 // owned_by_operator will check, from a response body, if the resource is managed by pulp operator
-func owned_by_operator(response responseBody, owner string) bool {
+/* func OwnedByOperator(response *http.Response, owner string) bool {
 	return response.Results[0].(map[string]interface{})["pulp_labels"].(map[string]interface{})["owner"] == owner
-}
+} */
 
-func getClientConfig(ctx context.Context, r RepoManagerPulpResourceReconciler, pulpResource pulpv1.PulpResource, log logr.Logger) pulpClient {
+/* func getClientConfig(ctx context.Context, r RepoManagerPulpResourceReconciler, pulpResource pulpv1.PulpResource, log logr.Logger) pulpClient {
 	pulpClient := pulpClient{
 		Address:  get_api_svc(pulpResource.Name),
 		Username: PULP_ADMIN_USER,
@@ -205,9 +219,9 @@ func getClientConfig(ctx context.Context, r RepoManagerPulpResourceReconciler, p
 	}
 
 	return pulpClient
-}
+} */
 
-func (r RepoManagerPulpResourceReconciler) update_status_fields(pulpResource *pulpv1.PulpResource, pulpClient pulpClient) {
+/* func (r RepoManagerPulpResourceReconciler) update_status_fields(pulpResource *pulpv1.PulpResource, pulpClient pulpClient) {
 	var wg sync.WaitGroup
 	for plugin, resource := range plugins {
 		wg.Add(1)
@@ -237,7 +251,7 @@ func (r RepoManagerPulpResourceReconciler) update_status_fields(pulpResource *pu
 	}
 	wg.Wait()
 	r.Status().Update(pulpClient.Context, pulpResource)
-}
+} */
 
 func pulpResourceOwner(pulpResource pulpv1.PulpResource) string {
 	return pulpResource.Name + "." + pulpResource.Namespace

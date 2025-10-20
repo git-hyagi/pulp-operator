@@ -1,4 +1,4 @@
-package pulp_resources
+package utils
 
 const (
 	PULP_ADMIN_USER = "admin"

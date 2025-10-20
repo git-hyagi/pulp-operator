@@ -21,7 +21,6 @@ import (
 
 	"github.com/go-logr/logr"
 	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
-	bindings "github.com/pulp/pulp-operator/bindings/release"
 	"github.com/pulp/pulp-operator/controllers"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -58,16 +57,16 @@ func (r *RepoManagerPulpResourceReconciler) Reconcile(ctx context.Context, req c
 		return ctrl.Result{}, err
 	}
 
-	cfg := bindings.NewConfiguration()
-	clientBinding := bindings.NewAPIClient(cfg)
-	ctx = context.WithValue(ctx, bindings.ContextBasicAuth, bindings.BasicAuth{UserName: "admin", Password: "password"})
+	/* 	cfg := bindings.NewConfiguration()
+	   	clientBinding := bindings.NewAPIClient(cfg)
+	   	ctx = context.WithValue(ctx, bindings.ContextBasicAuth, bindings.BasicAuth{UserName: "admin", Password: "password"})
 
-	pulpClient := getClientConfig(ctx, *r, *pulpResource, log)
-	r.createPulpResources(ctx, pulpResource, pulpClient, clientBinding)
-	r.syncPulpResources(pulpResource, pulpClient)
+	   	pulpClient := getClientConfig(ctx, *r, *pulpResource, log)
+	   	r.createPulpResources(ctx, pulpResource, pulpClient, clientBinding)
+	   	r.syncPulpResources(pulpResource, pulpClient)
 
-	r.update_status_fields(pulpResource, pulpClient)
-	log.Info("Pulp resources synced")
+	   	r.update_status_fields(pulpResource, pulpClient)
+	   	log.Info("Pulp resources synced") */
 	return ctrl.Result{}, nil
 }
 
