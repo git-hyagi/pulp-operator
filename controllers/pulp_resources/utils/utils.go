@@ -256,8 +256,36 @@ func create_status_fields(pulpResource *pulpv1.PulpResource, plugin string, reso
 func pulpResourceOwner(pulpResource pulpv1.PulpResource) string {
 	return pulpResource.Name + "." + pulpResource.Namespace
 }
-func operatorLabels(pulpResource pulpv1.PulpResource) map[string]string {
-	return map[string]string{
-		"owner": pulpResourceOwner(pulpResource),
+
+//func OperatorLabels(pulpResource pulpv1.PulpResource) map[string]string {
+//	return map[string]string{
+//		"owner": pulpResourceOwner(pulpResource),
+//	}
+//}
+
+func OperatorLabels(pulpResource pulpv1.PulpResource) bindings.SetLabel {
+	pulpResourceOwner := pulpResourceOwner(pulpResource)
+	return bindings.SetLabel{
+		Key:   "owner",
+		Value: *bindings.NewNullableString(&pulpResourceOwner),
 	}
+
+}
+
+// GetResource returns the name of the resource (repository/remote/distribution) defined in PulpResource CR
+// or nil if the resource is already created or is not defined
+func GetResource(pulpResource *pulpv1.PulpResource, pluginName, resourceType string) *string {
+	pluginField := reflect.ValueOf(*pulpResource).FieldByName("Spec").FieldByName(pluginName)
+	if FieldEmpty(pluginField) {
+		return nil
+	}
+	if IsStatusPluginEqualsToSpec(pulpResource, pluginName) {
+		return nil
+	}
+	resourceValue := reflect.Indirect(pluginField).FieldByName(resourceType)
+	if FieldEmpty(resourceValue) {
+		return nil
+	}
+	resourceName := reflect.Indirect(resourceValue).FieldByName("Name").Interface().(string)
+	return &resourceName
 }

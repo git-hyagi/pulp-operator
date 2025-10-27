@@ -1,16 +1,6 @@
 package pulp_resources
 
-import (
-	"context"
-	"reflect"
-	"sync"
-
-	"github.com/go-logr/logr"
-	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
-	bindings "github.com/pulp/pulp-operator/bindings/release"
-)
-
-func (r *RepoManagerPulpResourceReconciler) createPulpResources(ctx context.Context, pulpResource *pulpv1.PulpResource, pulpClient pulpClient, clientBinding *bindings.APIClient) {
+/* func (r *RepoManagerPulpResourceReconciler) createPulpResources(ctx context.Context, pulpResource *pulpv1.PulpResource, pulpClient pulpClient, clientBinding *bindings.APIClient) {
 
 	log := pulpClient.Log
 	owner := pulpResourceOwner(*pulpResource)
@@ -312,3 +302,4 @@ func get_pulp_href(log logr.Logger, plugin, resourceType, resourceName string, p
 	log.V(1).Info("GET response " + resourceHref)
 	return resourceHref
 }
+*/

@@ -20,13 +20,16 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
 	"github.com/pulp/pulp-operator/controllers"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	pulpv1 "github.com/pulp/pulp-operator/apis/repo-manager.pulpproject.org/v1"
+	bindings "github.com/pulp/pulp-operator/bindings/release"
+	pulp_file "github.com/pulp/pulp-operator/controllers/pulp_resources/pulp_file"
 )
 
 // RepoManagerPulpResourceReconciler reconciles a PulpResource object
@@ -67,6 +70,25 @@ func (r *RepoManagerPulpResourceReconciler) Reconcile(ctx context.Context, req c
 
 	   	r.update_status_fields(pulpResource, pulpClient)
 	   	log.Info("Pulp resources synced") */
+
+	cfg := bindings.NewConfiguration()
+	clientBinding := bindings.NewAPIClient(cfg)
+	ctx = context.WithValue(ctx, bindings.ContextBasicAuth, bindings.BasicAuth{UserName: "admin", Password: "password"})
+
+	if pulpResource.Status == nil {
+		pulpResource.Status = &pulpv1.PulpResourceStatus{}
+	}
+
+	if reconcile, err := pulp_file.ManageFileRepository(ctx, pulpResource, clientBinding); err != nil || reconcile != nil {
+		return *reconcile, err
+	}
+	if reconcile, err := pulp_file.ManageFileRemote(ctx, pulpResource, clientBinding); err != nil || reconcile != nil {
+		return *reconcile, err
+	}
+	if reconcile, err := pulp_file.ManageFileDistribution(ctx, pulpResource, clientBinding); err != nil || reconcile != nil {
+		return *reconcile, err
+	}
+
 	return ctrl.Result{}, nil
 }
 
